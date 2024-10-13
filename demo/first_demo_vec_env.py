@@ -120,9 +120,11 @@ class MarketEnv(gymnasium.Env):
 
         # Adjust price based on the market-clearing condition and production cost
         if self.total_demand > self.total_supply:
-            self.price = min(self.price + 1, 100, production_cost+1)  # Price cap at 100
+            self.price = min(self.price + 1, 200)  # Price cap at 200
+            #self.price = min(self.price + 1, 100, production_cost+1)  # Price cap at 100
         else:
-            self.price = max(self.price - 1, production_cost+1)  # Minimum price of 1
+            #self.price = max(self.price - 1, production_cost+1)  # Minimum price of 1
+            self.price = max(self.price - 1, 1)  # Minimum price of 1
 
         # Producer's revenue
         producer_revenue = self.price * producer_quantity
@@ -181,10 +183,10 @@ matplotlib.use('Agg')  # Use the 'Agg' backend for rendering without a display
 if __name__ == '__main__':
     # Create and check the environment
     # Create a vectorized environment with 8 instances
-    agents_number = 3
-    test_periods = 10
+    agents_number = 10
+    test_periods = 200
     #total_training_timesteps = 100000
-    total_training_timesteps = 25000
+    total_training_timesteps = 500000
     seed = 1
     env = SubprocVecEnv([make_env for _ in range(agents_number)])
 
@@ -271,7 +273,7 @@ if __name__ == '__main__':
 
     # Plot the accumulated profit over time
     plt.figure(figsize=(10, 6))
-    for agent in range(3):  # Assuming 3 agents
+    for agent in range(agents_number):  # Assuming 3 agents
         plt.plot(steps, accumulated_profits[agent], marker='o', linestyle='-', label=f'Agent {agent+1} Accumulated Profit')
     plt.title('Accumulated Profit of each Agent Over Test Steps')
     plt.xlabel('Step')
