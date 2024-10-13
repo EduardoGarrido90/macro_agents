@@ -1,0 +1,8 @@
+0. Necesita 50000 timesteps para que converga la loss pero la varianza no esta explicada. Además, en el environment vectorial los resultados tienen muchisima varianza. Se podria estimar su valor, hacerlo.  
+0. Subir a Github.
+1. Ajustar bien de verdad la curva de coste de produccion de un bien para que sea realista. Usar para ello chatgpt, se puede incluso hacer una regresion en base a datos para el entorno. 
+2. Hacer que la competencia no produzca aleatoriamente, asi es imposible producir, el agente debe observar lo que produce la competencia, meterlo en el observation space. Tambien meter que sea un proceso estocastico, un random walk, y no simplemente aleatorio sino un proceso de markov, dependiente del ultimo estado. 
+3. Si todo va bien y aprende, ir metiendo 4 efectos mas, no meter ninguno mas hasta que no aprenda sobre los anteriores.
+4. Hacer un baseline que siempre produce lo mismo y otro que es aleatorio para comparar el performance.
+5. Ponderar esto estadísticamente. 
+6. Optimizacion de hiperparametros.
