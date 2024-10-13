@@ -49,41 +49,13 @@ class MetricsCallback(BaseCallback):
 
         self.timesteps.append(self.num_timesteps)
 
-    '''
-    def _on_rollout_end(self) -> None:
-        # Access the policy object for vectorized environment
-        if hasattr(self.model, 'logger'):
-            logs = self.model.logger.name_to_value
-            loss = logs.get('train/loss', None)
-            import pdb; pdb.set_trace();
-            value_loss = logs.get('train/value_loss', None)
-            approx_kl = logs.get('train/approx_kl', None)
-            exp_var = logs.get('train/exp_var', None)
-            
-            # Assuming metrics are lists with a value for each agent
-            if loss is not None:
-                for i in range(self.num_agents):
-                    self.losses[i].append(loss)
-            if value_loss is not None:
-                for i in range(self.num_agents):
-                    self.value_losses[i].append(value_loss)
-            if approx_kl is not None:
-                for i in range(self.num_agents):
-                    self.approx_kls[i].append(approx_kl)
-            if exp_var is not None:
-                for i in range(self.num_agents):
-                    self.explained_variance[i].append(exp_var)
-
-            self.timesteps.append(self.num_timesteps)
-    '''
-
 # Create the MarketEnv environment
 class MarketEnv(gymnasium.Env):
     def __init__(self):
         super(MarketEnv, self).__init__()
         
         # Action space for the producer (the agent): produce 0 to 10 units
-        self.action_space = spaces.Discrete(11)
+        self.action_space = spaces.Discrete(14)
         
         # Observation space: [current price, total supply, total demand]
         self.observation_space = spaces.Box(low=0, high=np.inf, shape=(3,), dtype=np.float32)
@@ -93,12 +65,12 @@ class MarketEnv(gymnasium.Env):
         self.total_supply = 0
         self.total_demand = 0
         
-        # Quadratic cost coefficient for the producer
-        self.cost_coefficient = 1.0
+        # Total production curve coefficients
+        self.cost_coefficients = np.array([0.0, 4.0, -0.6, 0.03])
         
         # Number of competitors and their production ranges
         self.num_competitors = 3
-        self.competitors_production_range = (0, 10)  # Each competitor can produce 0 to 10 units
+        self.competitors_production_range = (0, 13)  # Each competitor can produce 0 to 13 units
 
     def reset(self, seed=None, options=None):
         
@@ -135,9 +107,8 @@ class MarketEnv(gymnasium.Env):
         else:
             self.price = max(self.price - 1, 1)  # Minimum price of 1
         
-        # Cubic production cost for the agent
-        # TODO: make this more complex ax**3 + bx**2 + cx + d
-        production_cost = self.cost_coefficient * (producer_quantity ** 3)
+        # Cubic production cost for the agent, falta el logaritmo en base 1.1 para hacerla mas plana. 
+        production_cost = (self.cost_coefficients[3] * (producer_quantity ** 3) + self.cost_coefficients[2] * (producer_quantity ** 2) + self.cost_coefficients[1] * producer_quantity)*8.0
         
         # Producer's revenue
         producer_revenue = self.price * producer_quantity
