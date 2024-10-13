@@ -5,6 +5,7 @@ from stable_baselines3 import PPO
 from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.common.callbacks import BaseCallback
 
+PRODUCTION_NOISE=0.05
 
 class MetricsCallback(BaseCallback):
     def __init__(self, num_agents, verbose=0):
@@ -109,6 +110,7 @@ class MarketEnv(gymnasium.Env):
         
         # Cubic production cost for the agent, falta el logaritmo en base 1.1 para hacerla mas plana. 
         production_cost = (self.cost_coefficients[3] * (producer_quantity ** 3) + self.cost_coefficients[2] * (producer_quantity ** 2) + self.cost_coefficients[1] * producer_quantity)*8.0
+        production_cost = np.random.normal(loc=production_cost, scale=production_cost*PRODUCTION_NOISE)
         
         # Producer's revenue
         producer_revenue = self.price * producer_quantity
