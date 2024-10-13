@@ -6,6 +6,7 @@ from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.common.callbacks import BaseCallback
 
 PRODUCTION_NOISE=0.05
+PRODUCTION_LIMIT_PER_PRODUCER=14
 
 class MetricsCallback(BaseCallback):
     def __init__(self, num_agents, verbose=0):
@@ -20,8 +21,6 @@ class MetricsCallback(BaseCallback):
 
     def _on_step(self) -> bool:
         return True
-
-
     
     def _on_rollout_end(self) -> None:
         for agent_id in range(self.num_agents):
@@ -56,7 +55,7 @@ class MarketEnv(gymnasium.Env):
         super(MarketEnv, self).__init__()
         
         # Action space for the producer (the agent): produce 0 to 10 units
-        self.action_space = spaces.Discrete(14)
+        self.action_space = spaces.Discrete(PRODUCTION_LIMIT_PER_PRODUCER)
         
         # Observation space: [current price, total supply, total demand]
         self.observation_space = spaces.Box(low=0, high=np.inf, shape=(3,), dtype=np.float32)
@@ -71,8 +70,12 @@ class MarketEnv(gymnasium.Env):
         
         # Number of competitors and their production ranges
         self.num_competitors = 3
-        self.competitors_production_range = (0, 13)  # Each competitor can produce 0 to 13 units
+        self.competitors_production_range = (0, PRODUCTION_LIMIT_PER_PRODUCER-1)  # Each competitor can produce 0 to 13 units
 
+        # Competitors' actions (they also produce a random quantity within their range)
+        self.competitors_quantities = np.random.randint(self.competitors_production_range[0],
+                                                   self.competitors_production_range[1]+1,
+                                                   self.num_competitors)
     def reset(self, seed=None, options=None):
         
         super().reset(seed=seed)
@@ -81,7 +84,10 @@ class MarketEnv(gymnasium.Env):
         self.price = 10.0
         self.total_supply = 0
         self.total_demand = 0
-        
+        self.competitors_quantities = np.random.randint(self.competitors_production_range[0],
+                                                   self.competitors_production_range[1]+1,
+                                                   self.num_competitors)
+
         # Return the initial observation: [price, total_supply, total_demand]
         return np.array([self.price, self.total_supply, self.total_demand], dtype=np.float32), {}
 
@@ -89,29 +95,35 @@ class MarketEnv(gymnasium.Env):
         
         # Producer (agent) action: how much to produce (quantity)
         producer_quantity = action
-        
-        # Competitors' actions (they also produce a random quantity within their range)
-        competitors_quantities = np.random.randint(self.competitors_production_range[0], 
-                                                   self.competitors_production_range[1]+1, 
-                                                   self.num_competitors)
-        
+       
+        #Simulate competitors quantities. 
+        # Generate random steps for each competitor: -1, 0, or +1
+        random_steps = np.random.choice([-1, 0, 1], size=self.num_competitors)
+
+        # Update the competitors' quantities based on the random walk
+        self.competitors_quantities += random_steps
+
+        # Ensure the quantities stay within the defined range (0 to 14)
+        self.competitors_quantities = np.clip(self.competitors_quantities, 0, PRODUCTION_LIMIT_PER_PRODUCER)
+
         # Calculate total supply (producer + competitors)
         self.total_supply = producer_quantity + competitors_quantities.sum()
         
         # Demand function: assume a linear demand curve (demand decreases as price increases)
-        base_demand = 50  # Maximum demand when price is 0
+        base_demand = PRODUCTION_LIMIT_PER_PRODUCER * 3.5  # Maximum demand when price is 0
         self.total_demand = max(0, base_demand - 3 * self.price)
-        
-        # Adjust price based on the market-clearing condition
-        if self.total_demand > self.total_supply:
-            self.price = min(self.price + 1, 100)  # Price cap at 100
-        else:
-            self.price = max(self.price - 1, 1)  # Minimum price of 1
         
         # Cubic production cost for the agent, falta el logaritmo en base 1.1 para hacerla mas plana. 
         production_cost = (self.cost_coefficients[3] * (producer_quantity ** 3) + self.cost_coefficients[2] * (producer_quantity ** 2) + self.cost_coefficients[1] * producer_quantity)*8.0
         production_cost = np.random.normal(loc=production_cost, scale=production_cost*PRODUCTION_NOISE)
-        
+       
+
+        # Adjust price based on the market-clearing condition and production cost
+        if self.total_demand > self.total_supply:
+            self.price = min(self.price + 1, 100, production_cost+1)  # Price cap at 100
+        else:
+            self.price = max(self.price - 1, production_cost+1)  # Minimum price of 1
+
         # Producer's revenue
         producer_revenue = self.price * producer_quantity
         
