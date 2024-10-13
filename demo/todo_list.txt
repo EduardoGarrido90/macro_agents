@@ -1,5 +1,4 @@
 0. Necesita 50000 timesteps para que converga la loss pero la varianza no esta explicada. Además, en el environment vectorial los resultados tienen muchisima varianza. Se podria estimar su valor, hacerlo.  
-2. Hacer que la competencia no produzca aleatoriamente, asi es imposible producir, el agente debe observar lo que produce la competencia, meterlo en el observation space. Tambien meter que sea un proceso estocastico, un random walk, y no simplemente aleatorio sino un proceso de markov, dependiente del ultimo estado. 
 2b. La curva de produccion debe mejorar. Aunque ya esta mejor debe
 	- Ser estimada por un modelo de regresion lineal con efecto cubico y OLS con la estabilizacion mejor definida. Sacar dataset de eso y estimar.
 	- Aun seria mejor si encuentras un dataset real de esto.    

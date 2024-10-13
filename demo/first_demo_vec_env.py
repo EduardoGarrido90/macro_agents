@@ -107,7 +107,7 @@ class MarketEnv(gymnasium.Env):
         self.competitors_quantities = np.clip(self.competitors_quantities, 0, PRODUCTION_LIMIT_PER_PRODUCER)
 
         # Calculate total supply (producer + competitors)
-        self.total_supply = producer_quantity + competitors_quantities.sum()
+        self.total_supply = producer_quantity + self.competitors_quantities.sum()
         
         # Demand function: assume a linear demand curve (demand decreases as price increases)
         base_demand = PRODUCTION_LIMIT_PER_PRODUCER * 3.5  # Maximum demand when price is 0
