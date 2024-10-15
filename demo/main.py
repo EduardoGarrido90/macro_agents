@@ -179,17 +179,19 @@ def linear_schedule(initial_value: float) -> Callable[[float], float]:
 import matplotlib
 import matplotlib.pyplot as plt
 from stable_baselines3.common.vec_env import SubprocVecEnv
+from config.argument_parser import ArgumentParser
 matplotlib.use('Agg')  # Use the 'Agg' backend for rendering without a display
 
 if __name__ == '__main__':
-    # Create and check the environment
-    # Create a vectorized environment with 8 instances
-    agents_number = 10
-    test_periods = 200
-    #total_training_timesteps = 100000
-    #total_training_timesteps = 500000
-    total_training_timesteps = 50000 #demo
-    seed = 1
+    
+    # Encapsulate the argument parsing in the ArgumentParser class
+    argument_parser = ArgumentParser()
+    args = argument_parser.parse_args()
+    agents_number = args.agents_number
+    test_periods = args.test_periods
+    total_training_timesteps = args.total_training_timesteps
+    seed = args.seed
+
     env = SubprocVecEnv([make_env for _ in range(agents_number)])
 
     # Set up the PPO model for the environment
