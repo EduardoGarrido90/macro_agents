@@ -4,6 +4,7 @@ from gymnasium import spaces
 from stable_baselines3 import PPO
 from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.common.callbacks import BaseCallback
+from visual.metrics_plotter import MetricsPlotter
 
 PRODUCTION_NOISE=0.05
 PRODUCTION_LIMIT_PER_PRODUCER=14
@@ -186,7 +187,8 @@ if __name__ == '__main__':
     agents_number = 10
     test_periods = 200
     #total_training_timesteps = 100000
-    total_training_timesteps = 500000
+    #total_training_timesteps = 500000
+    total_training_timesteps = 50000 #demo
     seed = 1
     env = SubprocVecEnv([make_env for _ in range(agents_number)])
 
@@ -224,65 +226,5 @@ if __name__ == '__main__':
         print(f"The accumulated profit of the PPO agent {i+1} is: {ppo_performance[i]}")
 
 
-    # TODO: Vectorizar el resto como este.
-    # Ensure that you have data to plot
-    if metrics_callback.losses[0]:
-        plt.figure(figsize=(10, 6))
-        for agent in range(agents_number):
-            # Plot Model Loss
-            plt.plot(metrics_callback.timesteps, metrics_callback.losses[agent], label='Total Loss Agent ' + str(agent))
-        plt.xlabel('Timesteps')
-        plt.ylabel('Loss')
-        plt.legend()
-        plt.title('Model Losses over Time')
-        plt.savefig('results/model_loss.pdf')
-    
-    if metrics_callback.value_losses[0]:
-        plt.figure(figsize=(10, 6))
-        for agent in range(agents_number):
-            # Plot Model Loss
-            plt.plot(metrics_callback.timesteps, metrics_callback.losses[agent], label='Value Loss Agent ' + str(agent))
-        plt.xlabel('Timesteps')
-        plt.ylabel('Value Loss')
-        plt.legend()
-        plt.title('Value Losses over Time')
-        plt.savefig('results/value_loss.pdf')
-
-    
-    # Plot Approximate KL Divergence
-    if metrics_callback.approx_kls[0]:
-        plt.figure(figsize=(10, 6))
-        for agent in range(agents_number):
-            plt.plot(metrics_callback.timesteps, metrics_callback.approx_kls[agent], label='Approx KL Agent ' + str(agent))
-        plt.xlabel('Timesteps')
-        plt.ylabel('Approx KL Divergence')
-        plt.legend()
-        plt.title('Approximate KL Divergence over Time')
-        plt.savefig('results/approx_kl.pdf')
-
-    # Plot Explained Variance
-    if metrics_callback.explained_variance[0]:
-        plt.figure(figsize=(10, 6))
-        for agent in range(agents_number):
-            plt.plot(metrics_callback.timesteps, metrics_callback.explained_variance[agent], label='Explained variance Agent ' + str(agent))
-        plt.xlabel('Timesteps')
-        plt.ylabel('Explained Variance')
-        plt.legend()
-        plt.title('Explained Variance over Time')
-        plt.savefig('results/exp_var.pdf')
-
-    # Plot the accumulated profit over time
-    plt.figure(figsize=(10, 6))
-    for agent in range(agents_number):  # Assuming 3 agents
-        plt.plot(steps, accumulated_profits[agent], marker='o', linestyle='-', label=f'Agent {agent+1} Accumulated Profit')
-    plt.title('Accumulated Profit of each Agent Over Test Steps')
-    plt.xlabel('Step')
-    plt.ylabel('Accumulated Profit')
-    plt.grid(True)
-    plt.legend()
-
-    # Save the plot to a PDF file
-    plt.savefig('results/profit_evolution.pdf')
-
-    # Close the figure if you don't need it anymore
-    plt.close()
+    #We plot all the training progress of the agents and the performance in a new scenario. 
+    MetricsPlotter(metrics_callback, agents_number, accumulated_profits, steps, plot_everything=True)
