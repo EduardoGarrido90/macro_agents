@@ -11,6 +11,7 @@ class ArgumentParser:
         self.parser.add_argument('--test_periods', type=int, default=200, help='Number of test periods')
         self.parser.add_argument('--total_training_timesteps', type=int, default=50000, help='Total training timesteps')
         self.parser.add_argument('--seed', type=int, default=1, help='Random seed')
+        self.parser.add_argument('--max_actions', type=int, default=14, help='Maximum number of actions')
 
     def parse_args(self):
         # Parse and return the arguments

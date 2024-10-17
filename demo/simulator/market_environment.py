@@ -3,15 +3,16 @@ from gymnasium import spaces
 import numpy as np
 
 PRODUCTION_NOISE=0.05
-PRODUCTION_LIMIT_PER_PRODUCER=14
 
 # Create the MarketEnv environment
 class MarketEnv(gymnasium.Env):
-    def __init__(self):
+    def __init__(self, max_actions):
         super(MarketEnv, self).__init__()
 
+        self.production_limit_per_producer = max_actions
+        
         # Action space for the producer (the agent): produce 0 to 10 units
-        self.action_space = spaces.Discrete(PRODUCTION_LIMIT_PER_PRODUCER)
+        self.action_space = spaces.Discrete(self.production_limit_per_producer)
 
         # Observation space: [current price, total supply, total demand]
         self.observation_space = spaces.Box(low=0, high=np.inf, shape=(3,), dtype=np.float32)
@@ -26,7 +27,7 @@ class MarketEnv(gymnasium.Env):
 
         # Number of competitors and their production ranges
         self.num_competitors = 3
-        self.competitors_production_range = (0, PRODUCTION_LIMIT_PER_PRODUCER-1)  # Each competitor can produce 0 to 13 units
+        self.competitors_production_range = (0, self.production_limit_per_producer-1)  # Each competitor can produce 0 to 13 units
 
         # Competitors' actions (they also produce a random quantity within their range)
         self.competitors_quantities = np.random.randint(self.competitors_production_range[0],
@@ -61,13 +62,13 @@ class MarketEnv(gymnasium.Env):
         self.competitors_quantities += random_steps
 
         # Ensure the quantities stay within the defined range (0 to 14)
-        self.competitors_quantities = np.clip(self.competitors_quantities, 0, PRODUCTION_LIMIT_PER_PRODUCER)
+        self.competitors_quantities = np.clip(self.competitors_quantities, 0, self.production_limit_per_producer)
 
         # Calculate total supply (producer + competitors)
         self.total_supply = producer_quantity + self.competitors_quantities.sum()
 
         # Demand function: assume a linear demand curve (demand decreases as price increases)
-        base_demand = PRODUCTION_LIMIT_PER_PRODUCER * 3.5  # Maximum demand when price is 0
+        base_demand = self.production_limit_per_producer * 3.5  # Maximum demand when price is 0
         self.total_demand = max(0, base_demand - 3 * self.price)
 
         # Cubic production cost for the agent, falta el logaritmo en base 1.1 para hacerla mas plana.
