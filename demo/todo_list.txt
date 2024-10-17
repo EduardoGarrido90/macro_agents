@@ -1,4 +1,5 @@
 0. Necesita 50000 timesteps para que converga la loss pero la varianza no esta explicada. Además, en el environment vectorial los resultados tienen muchisima varianza. Se podria estimar su valor, hacerlo.  
+1. Mejorar el repo con todo tipo de cosas, ir preguntando a ChatGPT.
 2b. La curva de produccion debe mejorar. Aunque ya esta mejor debe
 	- Ser estimada por un modelo de regresion lineal con efecto cubico y OLS con la estabilizacion mejor definida. Sacar dataset de eso y estimar.
 	- Aun seria mejor si encuentras un dataset real de esto.    
