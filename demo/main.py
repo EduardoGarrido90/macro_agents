@@ -5,10 +5,12 @@ from visual.metrics_plotter import MetricsPlotter
 from visual.drl_metrics_callback import MetricsCallback
 from simulator.market_environment import MarketEnv
 
+
 def make_env(max_actions):
-    env = MarketEnv(max_actions)
-    check_env(env)
-    return env
+    def _init():
+        env = MarketEnv(max_actions)  # Crear la instancia de MarketEnv
+        return env
+    return _init  # Retorna la función _init, no el entorno directamente
 
 from typing import Callable
 def linear_schedule(initial_value: float) -> Callable[[float], float]:
