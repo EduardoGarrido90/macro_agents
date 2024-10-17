@@ -5,8 +5,8 @@ from visual.metrics_plotter import MetricsPlotter
 from visual.drl_metrics_callback import MetricsCallback
 from simulator.market_environment import MarketEnv
 
-def make_env():
-    env = MarketEnv()
+def make_env(max_actions):
+    env = MarketEnv(max_actions)
     check_env(env)
     return env
 
@@ -45,8 +45,9 @@ if __name__ == '__main__':
     test_periods = args.test_periods
     total_training_timesteps = args.total_training_timesteps
     seed = args.seed
+    max_actions = args.max_actions
 
-    env = SubprocVecEnv([make_env for _ in range(agents_number)])
+    env = SubprocVecEnv([make_env(max_actions) for _ in range(agents_number)])
 
     # Set up the PPO model for the environment
     model = PPO("MlpPolicy", env, learning_rate=1e-4, verbose=1, seed=seed)
