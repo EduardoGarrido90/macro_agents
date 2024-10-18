@@ -2,10 +2,12 @@ import matplotlib.pyplot as plt
 
 class MetricsPlotter:
 
-    def __init__(self, metrics_callback, agents_number, accumulated_profits, steps, plot_everything=False):
+    def __init__(self, metrics_callback, agents_number, accumulated_profits, default_accumulated_profits, random_accumulated_profits, steps, plot_everything=False):
         self.metrics_callback = metrics_callback
         self.agents_number = agents_number
         self.accumulated_profits = accumulated_profits
+        self.default_accumulated_profits = default_accumulated_profits
+        self.random_accumulated_profits = random_accumulated_profits
         self.steps = steps
         if plot_everything:
             self.plot_model_loss()
@@ -70,8 +72,12 @@ class MetricsPlotter:
     def plot_accumulated_profit(self):
         # Plot the accumulated profit over time
         plt.figure(figsize=(10, 6))
-        for agent in range(self.agents_number):  # Assuming 3 agents
+        for agent in range(self.agents_number): 
             plt.plot(self.steps, self.accumulated_profits[agent], marker='o', linestyle='-', label=f'Agent {agent+1} Accumulated Profit')
+        for agent in range(self.agents_number-1, self.agents_number + len(default_accumulated_profits)): 
+            plt.plot(self.steps, self.default_accumulated_profits[agent-self.agents_number], marker='o', linestyle='-', label=f'Default Agent {agent-self.agents_number} Accumulated Profit')
+        plt.plot(self.steps, self.random_accumulated_profits, marker='o', linestyle='-', label=f'Random Agent Accumulated Profit') 
+
         plt.title('Accumulated Profit of each Agent Over Test Steps')
         plt.xlabel('Step')
         plt.ylabel('Accumulated Profit')

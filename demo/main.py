@@ -28,7 +28,7 @@ if __name__ == '__main__':
     seed = args.seed
     max_actions = args.max_actions
 
-    env = SubprocVecEnv([make_env(max_actions) for _ in range(agents_number)])
+    env = SubprocVecEnv([make_env(max_actions) for _ in range(agents_number+max_actions+1)]) #agents+default agents+random agent
 
     # Set up the PPO model for the environment
     model = PPO("MlpPolicy", env, learning_rate=1e-4, verbose=1, seed=seed)
@@ -50,14 +50,28 @@ if __name__ == '__main__':
     steps = [0]
     for step in range(test_periods):
         action, _states = model.predict(obs)
+        agents_actions = action[0:agents_number]
         default_action_agents = np.linspace(0, max_actions-1, num=max_actions).astype(int)
-        import pdb; pdb.set_trace();
+        random_action_agent = np.random.randint(0,3)
+        action = np.append(np.append(agents_actions, default_action_agents), random_action_agent)
+        #Building the final action.
         obs, reward, terminated, truncated = env.step(action) #debug this an check how to create a fix agent, got to be easy do not worry, for tomorrow. 
         env.render()
         # Update performance for each agent
+        # Normal agents
         for i in range(agents_number):
             ppo_performance[i] += reward[i]
             accumulated_profits[i].append(ppo_performance[i])
+        
+        # Default agents
+        for i in range(agents_number-1, len(reward)-1):
+            default_agents_performance[i-agents_number] += reward[i]
+            default_accumulated_profits[i-agents_number].append(default_agents_performance[i-agents_number])
+
+        # Random agent
+        random_agent_performance += reward[-1]
+        random_accumulated_profits.append(random_agent_performance[-1])
+
         steps.append(step+1)
         print(f"Step: {step+1}, Action: {action}, Reward: {reward}")
 
@@ -69,5 +83,10 @@ if __name__ == '__main__':
     for i in range(agents_number):
         print(f"The accumulated profit of the PPO agent {i+1} is: {ppo_performance[i]}")
 
+    for i in range(agents_number-1, len(reward)-1):
+        print(f"The accumulated profit of the default agent {i+1} is: {default_agents_performance[i]}")
+
+    print(f"The accumulated profit of the random agent is: {random_agent_performance}")
+
     #We plot all the training progress of the agents and the performance in a new scenario. 
-    MetricsPlotter(metrics_callback, agents_number, accumulated_profits, steps, plot_everything=True)
+    MetricsPlotter(metrics_callback, agents_number, accumulated_profits, default_accumulated_profits, random_accumulated_profits, steps, plot_everything=True)
