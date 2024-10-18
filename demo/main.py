@@ -64,7 +64,7 @@ if __name__ == '__main__':
             accumulated_profits[i].append(ppo_performance[i])
         
         # Default agents
-        for i in range(agents_number-1, len(reward)-1):
+        for i in range(agents_number, agents_number + max_actions):
             default_agents_performance[i-agents_number] += reward[i]
             default_accumulated_profits[i-agents_number].append(default_agents_performance[i-agents_number])
 

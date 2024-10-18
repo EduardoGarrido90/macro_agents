@@ -74,8 +74,7 @@ class MetricsPlotter:
         plt.figure(figsize=(10, 6))
         for agent in range(self.agents_number): 
             plt.plot(self.steps, self.accumulated_profits[agent], marker='o', linestyle='-', label=f'Agent {agent+1} Accumulated Profit')
-        for agent in range(self.agents_number-1, self.agents_number + len(self.default_accumulated_profits)): 
-            import pdb; pdb.set_trace();
+        for agent in range(self.agents_number, self.agents_number + len(self.default_accumulated_profits)): 
             plt.plot(self.steps, self.default_accumulated_profits[agent-self.agents_number], marker='o', linestyle='-', label=f'Default Agent {agent-self.agents_number} Accumulated Profit')
         plt.plot(self.steps, self.random_accumulated_profits, marker='o', linestyle='-', label=f'Random Agent Accumulated Profit') 
 
