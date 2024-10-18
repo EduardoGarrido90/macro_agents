@@ -89,5 +89,4 @@ if __name__ == '__main__':
     print(f"The accumulated profit of the random agent is: {random_agent_performance}")
 
     #We plot all the training progress of the agents and the performance in a new scenario. 
-    import pdb; pdb.set_trace();
     MetricsPlotter(metrics_callback, agents_number, accumulated_profits, default_accumulated_profits, random_accumulated_profits, steps, plot_everything=True)

@@ -27,7 +27,7 @@ class MetricsPlotter:
             plt.ylabel('Loss')
             plt.legend()
             plt.title('Model Losses over Time')
-            plt.savefig('results/model_loss.pdf')
+            plt.savefig('../results/model_loss.pdf')
             plt.close()
 
     def plot_value_loss(self):
@@ -40,7 +40,7 @@ class MetricsPlotter:
             plt.ylabel('Value Loss')
             plt.legend()
             plt.title('Value Losses over Time')
-            plt.savefig('results/value_loss.pdf')
+            plt.savefig('../results/value_loss.pdf')
             plt.close()
 
     def plot_approx_kl(self):
@@ -53,7 +53,7 @@ class MetricsPlotter:
             plt.ylabel('Approx KL Divergence')
             plt.legend()
             plt.title('Approximate KL Divergence over Time')
-            plt.savefig('results/approx_kl.pdf')
+            plt.savefig('../results/approx_kl.pdf')
             plt.close()
 
     def plot_explained_variance(self):
@@ -66,7 +66,7 @@ class MetricsPlotter:
             plt.ylabel('Explained Variance')
             plt.legend()
             plt.title('Explained Variance over Time')
-            plt.savefig('results/exp_var.pdf')
+            plt.savefig('../results/exp_var.pdf')
             plt.close()
 
     def plot_accumulated_profit(self):
@@ -85,6 +85,6 @@ class MetricsPlotter:
         plt.legend()
 
         # Save the plot to a PDF file
-        plt.savefig('results/profit_evolution.pdf')
+        plt.savefig('../results/profit_evolution.pdf')
         plt.close()
 
