@@ -50,6 +50,8 @@ if __name__ == '__main__':
     steps = [0]
     for step in range(test_periods):
         action, _states = model.predict(obs)
+        default_action_agents = np.linspace(0, max_actions-1, num=max_actions).astype(int)
+        import pdb; pdb.set_trace();
         obs, reward, terminated, truncated = env.step(action) #debug this an check how to create a fix agent, got to be easy do not worry, for tomorrow. 
         env.render()
         # Update performance for each agent
