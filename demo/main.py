@@ -70,7 +70,7 @@ if __name__ == '__main__':
 
         # Random agent
         random_agent_performance += reward[-1]
-        random_accumulated_profits.append(random_agent_performance[-1])
+        random_accumulated_profits.append(random_agent_performance)
 
         steps.append(step+1)
         print(f"Step: {step+1}, Action: {action}, Reward: {reward}")
@@ -83,10 +83,11 @@ if __name__ == '__main__':
     for i in range(agents_number):
         print(f"The accumulated profit of the PPO agent {i+1} is: {ppo_performance[i]}")
 
-    for i in range(agents_number-1, len(reward)-1):
+    for i in range(len(default_agents_performance)):
         print(f"The accumulated profit of the default agent {i+1} is: {default_agents_performance[i]}")
 
     print(f"The accumulated profit of the random agent is: {random_agent_performance}")
 
     #We plot all the training progress of the agents and the performance in a new scenario. 
+    import pdb; pdb.set_trace();
     MetricsPlotter(metrics_callback, agents_number, accumulated_profits, default_accumulated_profits, random_accumulated_profits, steps, plot_everything=True)
