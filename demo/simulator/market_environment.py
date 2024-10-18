@@ -11,11 +11,19 @@ class MarketEnv(gymnasium.Env):
 
         self.production_limit_per_producer = max_actions
         
+        self.competitors_production_range = (0, self.production_limit_per_producer-1)  # Each competitor can produce 0 to 13 units
+        self.num_competitors = 3 #Needs to be parametrized.
+
+        # Competitors' actions (they also produce a random quantity within their range)
+        self.competitors_quantities = np.random.randint(self.competitors_production_range[0],
+                                                   self.competitors_production_range[1]+1,
+                                                   self.num_competitors)
+
         # Action space for the producer (the agent): produce 0 to 10 units
         self.action_space = spaces.Discrete(self.production_limit_per_producer)
 
-        # Observation space: [current price, total supply, total demand]
-        self.observation_space = spaces.Box(low=0, high=np.inf, shape=(3,), dtype=np.float32)
+        # Observation space: [current price, total supply, total demand, units produced of competitors]
+        self.observation_space = spaces.Box(low=0, high=np.inf, shape=(3+self.num_competitors,), dtype=np.float32)
 
         # Initial price and supply
         self.price = 10.0
@@ -25,14 +33,6 @@ class MarketEnv(gymnasium.Env):
         # Total production curve coefficients
         self.cost_coefficients = np.array([0.0, 4.0, -0.6, 0.03])
 
-        # Number of competitors and their production ranges
-        self.num_competitors = 3
-        self.competitors_production_range = (0, self.production_limit_per_producer-1)  # Each competitor can produce 0 to 13 units
-
-        # Competitors' actions (they also produce a random quantity within their range)
-        self.competitors_quantities = np.random.randint(self.competitors_production_range[0],
-                                                   self.competitors_production_range[1]+1,
-                                                   self.num_competitors)
 
     def reset(self, seed=None, options=None):
 
@@ -45,8 +45,10 @@ class MarketEnv(gymnasium.Env):
                                                    self.competitors_production_range[1]+1,
                                                    self.num_competitors)
 
-        # Return the initial observation: [price, total_supply, total_demand]
-        return np.array([self.price, self.total_supply, self.total_demand], dtype=np.float32), {}
+        # Return the initial observation: [price, total_supply, total_demand, units produced of competitors]
+        observation = np.array([self.price, self.total_supply, self.total_demand], dtype=np.float32)
+        observation = np.append(observation, self.competitors_quantities)
+        return observation, {}
 
 
     def step(self, action):
@@ -91,8 +93,9 @@ class MarketEnv(gymnasium.Env):
         # Calculate producer's profit: revenue - cost
         producer_profit = producer_revenue - production_cost
 
-        # Observation: [price, total supply, total demand]
+        # Observation: [price, total supply, total demand, production of competitors]
         observation = np.array([self.price, self.total_supply, self.total_demand], dtype=np.float32)
+        observation = np.append(observation, self.competitors_quantities)
 
         # Reward is the producer's profit
         reward = producer_profit

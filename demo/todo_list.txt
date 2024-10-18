@@ -1,13 +1,10 @@
-0. Necesita 50000 timesteps para que converga la loss pero la varianza no esta explicada. Además, en el environment vectorial los resultados tienen muchisima varianza. Se podria estimar su valor, hacerlo.  
-1. Mejorar el repo con todo tipo de cosas, ir preguntando a ChatGPT.
+1. Hacer que el simulador haga algo realista, cuadrar los numeros para el ejemplo.
 2b. La curva de produccion debe mejorar. Aunque ya esta mejor debe
 	- Ser estimada por un modelo de regresion lineal con efecto cubico y OLS con la estabilizacion mejor definida. Sacar dataset de eso y estimar.
 	- Aun seria mejor si encuentras un dataset real de esto.    
 3. Si todo va bien y aprende, ir metiendo 4 efectos mas, no meter ninguno mas hasta que no aprenda sobre los anteriores.
 3c. Meter la competencia en el espacio de observaciones, meter el precio en el espacio de observaciones. Si el agente no lo ve no puede reaccionar. 
-4. Hacer un baseline que siempre produce lo mismo y otro que es aleatorio para comparar el performance.
-	- One agent per constant action.
-	- One random agent. 
+4. Mejorar el repo con todo tipo de cosas, ir preguntando a ChatGPT.
 5. Ponderar esto estadísticamente. 
 6. Optimizacion de hiperparametros y con otros modelos (PPO, SAC, DDPG, etc...)
 
