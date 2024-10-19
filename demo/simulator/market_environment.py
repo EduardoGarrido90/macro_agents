@@ -31,7 +31,7 @@ class MarketEnv(gymnasium.Env):
         self.total_demand = 0
 
         # Fixed costs per day.
-        self.fixed_costs_company = -100.0
+        self.fixed_costs_company = 100.0
 
         # Total production curve coefficients
         self.cost_coefficients = np.array([0.0, 4.0, -0.6, 0.03])
