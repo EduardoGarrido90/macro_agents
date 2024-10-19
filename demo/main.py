@@ -53,7 +53,7 @@ if __name__ == '__main__':
         action, _states = model.predict(obs)
         agents_actions = action[0:agents_number]
         default_action_agents = np.linspace(0, max_actions-1, num=max_actions).astype(int)
-        random_action_agent = np.random.randint(0,3)
+        random_action_agent = np.random.randint(0, 3, number_random_agents)
         action = np.append(np.append(agents_actions, default_action_agents), random_action_agent)
         #Building the final action.
         obs, reward, terminated, truncated = env.step(action) #debug this an check how to create a fix agent, got to be easy do not worry, for tomorrow. 

@@ -30,6 +30,9 @@ class MarketEnv(gymnasium.Env):
         self.total_supply = 0
         self.total_demand = 0
 
+        # Fixed costs per day.
+        self.fixed_costs_company = -100.0
+
         # Total production curve coefficients
         self.cost_coefficients = np.array([0.0, 4.0, -0.6, 0.03])
 
@@ -91,7 +94,7 @@ class MarketEnv(gymnasium.Env):
         producer_revenue = self.price * producer_quantity
 
         # Calculate producer's profit: revenue - cost
-        producer_profit = producer_revenue - production_cost
+        producer_profit = producer_revenue - production_cost - self.fixed_costs_company
 
         # Observation: [price, total supply, total demand, production of competitors]
         observation = np.array([self.price, self.total_supply, self.total_demand], dtype=np.float32)

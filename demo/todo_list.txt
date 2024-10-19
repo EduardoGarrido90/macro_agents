@@ -1,4 +1,4 @@
-1. Hacer que el simulador haga algo realista, cuadrar los numeros para el ejemplo. Seguir metiendo historias en el espacio de observaciones.
+1. Hacer que el simulador haga algo realista, cuadrar los numeros para el ejemplo. Hacer que no sea mejor para una cantidad producida dada. 
 2b. La curva de produccion debe mejorar. Aunque ya esta mejor debe
 	- Ser estimada por un modelo de regresion lineal con efecto cubico y OLS con la estabilizacion mejor definida. Sacar dataset de eso y estimar.
 	- Aun seria mejor si encuentras un dataset real de esto.    
