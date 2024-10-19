@@ -25,7 +25,7 @@ class MetricsPlotter:
                 plt.plot(self.metrics_callback.timesteps, self.metrics_callback.losses[agent], label='Total Loss Agent ' + str(agent))
             plt.xlabel('Timesteps')
             plt.ylabel('Loss')
-            plt.legend()
+            plt.legend(loc='upper left')
             plt.title('Model Losses over Time')
             plt.savefig('../results/model_loss.pdf')
             plt.close()
@@ -38,7 +38,7 @@ class MetricsPlotter:
                 plt.plot(self.metrics_callback.timesteps, self.metrics_callback.losses[agent], label='Value Loss Agent ' + str(agent))
             plt.xlabel('Timesteps')
             plt.ylabel('Value Loss')
-            plt.legend()
+            plt.legend(loc='upper left')
             plt.title('Value Losses over Time')
             plt.savefig('../results/value_loss.pdf')
             plt.close()
@@ -51,7 +51,7 @@ class MetricsPlotter:
                 plt.plot(self.metrics_callback.timesteps, self.metrics_callback.approx_kls[agent], label='Approx KL Agent ' + str(agent))
             plt.xlabel('Timesteps')
             plt.ylabel('Approx KL Divergence')
-            plt.legend()
+            plt.legend(loc='upper left')
             plt.title('Approximate KL Divergence over Time')
             plt.savefig('../results/approx_kl.pdf')
             plt.close()
@@ -64,7 +64,7 @@ class MetricsPlotter:
                 plt.plot(self.metrics_callback.timesteps, self.metrics_callback.explained_variance[agent], label='Explained variance Agent ' + str(agent))
             plt.xlabel('Timesteps')
             plt.ylabel('Explained Variance')
-            plt.legend()
+            plt.legend(loc='upper left')
             plt.title('Explained Variance over Time')
             plt.savefig('../results/exp_var.pdf')
             plt.close()
@@ -76,13 +76,14 @@ class MetricsPlotter:
             plt.plot(self.steps, self.accumulated_profits[agent], marker='o', linestyle='-', label=f'Agent {agent+1} Accumulated Profit')
         for agent in range(self.agents_number, self.agents_number + len(self.default_accumulated_profits)): 
             plt.plot(self.steps, self.default_accumulated_profits[agent-self.agents_number], marker='o', linestyle='-', label=f'Default Agent {agent-self.agents_number} Accumulated Profit')
-        plt.plot(self.steps, self.random_accumulated_profits, marker='o', linestyle='-', label=f'Random Agent Accumulated Profit') 
+        for agent in range(self.agents_number + len(self.default_accumulated_profits), self.agents_number + len(self.default_accumulated_profits) + len(self.random_accumulated_profits)):
+            plt.plot(self.steps, self.random_accumulated_profits[agent-self.agents_number-len(self.default_accumulated_profits)], marker='o', linestyle='-', label=f'Random Agent {agent-self.agents_number-len(self.default_accumulated_profits)} Accumulated Profit') 
 
         plt.title('Accumulated Profit of each Agent Over Test Steps')
         plt.xlabel('Step')
         plt.ylabel('Accumulated Profit')
         plt.grid(True)
-        plt.legend()
+        plt.legend(loc='upper left')
 
         # Save the plot to a PDF file
         plt.savefig('../results/profit_evolution.pdf')
