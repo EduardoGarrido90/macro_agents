@@ -31,7 +31,7 @@ class MarketEnv(gymnasium.Env):
         self.total_demand = 0
 
         # Fixed costs per day.
-        self.fixed_costs_company = 5.0
+        self.fixed_costs_company = np.random.normal(5.0, 0.5)
 
         # Total production curve coefficients
         self.cost_coefficients = np.array([0.0, 4.0, -0.6, 0.03])
@@ -74,7 +74,7 @@ class MarketEnv(gymnasium.Env):
 
         # Demand function: assume a linear demand curve (demand decreases as price increases)
         base_demand = self.production_limit_per_producer * 3.5  # Maximum demand when price is 0
-        self.total_demand = max(0, base_demand - 3 * self.price)
+        self.total_demand = max(0, base_demand - 3 * self.price) #TODO: La demanda deberia ser cuadratica, y ademas es baja.
 
         # Cubic production cost for the agent, falta el logaritmo en base 1.1 para hacerla mas plana.
         production_cost = (self.cost_coefficients[3] * (producer_quantity ** 3) + self.cost_coefficients[2] * (producer_quantity ** 2) + self.cost_coefficients[1] * producer_quantity)*8.0
@@ -82,6 +82,9 @@ class MarketEnv(gymnasium.Env):
 
 
         # Adjust price based on the market-clearing condition and production cost
+        #TODO: El precio debe variar mas abruptamente en base al resto, cambia muy poco.
+        #Le damos al agente muy poco margen de maniobra para reaccionar.
+        #La subida del precio debe no ser fija.
         if self.total_demand > self.total_supply:
             self.price = min(self.price + 1, 200)  # Price cap at 200
             #self.price = min(self.price + 1, 100, production_cost+1)  # Price cap at 100
