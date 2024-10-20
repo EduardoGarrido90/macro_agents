@@ -32,7 +32,8 @@ if __name__ == '__main__':
     env = SubprocVecEnv([make_env(max_actions) for _ in range(agents_number+max_actions+number_random_agents)]) #agents+default agents+random agent
 
     # Set up the PPO model for the environment
-    model = PPO("MlpPolicy", env, learning_rate=1e-4, verbose=1, seed=seed)
+    #model = PPO("MlpPolicy", env, learning_rate=1e-4, verbose=1, seed=seed)
+    model = PPO("MlpPolicy", env, learning_rate=5e-5, verbose=1, seed=seed)
 
     metrics_callback = MetricsCallback(agents_number)
 

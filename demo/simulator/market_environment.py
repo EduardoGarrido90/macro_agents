@@ -3,6 +3,9 @@ from gymnasium import spaces
 import numpy as np
 
 PRODUCTION_NOISE=0.05
+UP = 0
+DOWN = 1
+EQUAL = 2
 
 # Create the MarketEnv environment
 class MarketEnv(gymnasium.Env):
@@ -35,6 +38,7 @@ class MarketEnv(gymnasium.Env):
 
         # Total production curve coefficients
         self.cost_coefficients = np.array([0.0, 4.0, -0.6, 0.03])
+        self.previous_action = 0
 
 
     def reset(self, seed=None, options=None):
@@ -44,12 +48,14 @@ class MarketEnv(gymnasium.Env):
         self.price = 10.0
         self.total_supply = 0
         self.total_demand = 0
+        self.previous_action = 0
+        self.progress_action = EQUAL
         self.competitors_quantities = np.random.randint(self.competitors_production_range[0],
                                                    self.competitors_production_range[1]+1,
                                                    self.num_competitors)
 
         # Return the initial observation: [price, total_supply, total_demand, units produced of competitors]
-        observation = np.array([self.price, self.total_supply, self.total_demand], dtype=np.float32)
+        observation = np.array([self.price, self.total_supply, self.total_demand, self.progress_action], dtype=np.float32)
         observation = np.append(observation, self.competitors_quantities)
         return observation, {}
 
@@ -59,9 +65,18 @@ class MarketEnv(gymnasium.Env):
         # Producer (agent) action: how much to produce (quantity)
         producer_quantity = action
 
-        #Simulate competitors quantities.
-        # Generate random steps for each competitor: -1, 0, or +1
-        random_steps = np.random.choice([-1, 0, 1], size=self.num_competitors)
+        #Simulate competitors quantities as response to our previous action in a random walk.
+        if producer_quantity > self.previous_action:
+            random_steps = np.random.choice([-1, 0], size=self.num_competitors)
+            self.progress_action = UP
+        elif producer_quantity == self.previous_action:
+            random_steps = np.random.choice([-1, 0, 1], size=self.num_competitors)
+            self.progress_action = DOWN
+        else:
+            random_steps = np.random.choice([0, 1], size=self.num_competitors)
+            self.progress_action = EQUAL
+
+        self.previous_action = producer_quantity
 
         # Update the competitors' quantities based on the random walk
         self.competitors_quantities += random_steps
@@ -74,9 +89,10 @@ class MarketEnv(gymnasium.Env):
 
         # Demand function: assume a linear demand curve (demand decreases as price increases)
         base_demand = self.production_limit_per_producer * 3.5  # Maximum demand when price is 0
-        elasticity = 1.5  # Aumentar este valor hace que la demanda sea más sensible a los cambios de precio
-        self.total_demand = max(0, base_demand - (self.price ** elasticity))
-        #self.total_demand = max(0, base_demand - 3 * self.price) #TODO: La demanda deberia ser cuadratica, y ademas es baja.
+        elasticity = 1.01  # Aumentar este valor hace que la demanda sea más sensible a los cambios de precio
+        #self.total_demand = max(0, base_demand - (self.price ** elasticity))
+        demand_fluctuation = np.random.normal(0, self.total_demand * 0.01)
+        self.total_demand = max(0, base_demand - 3 * self.price ** elasticity + demand_fluctuation) #TODO: La demanda deberia ser cuadratica, y ademas es baja.
 
         # Cubic production cost for the agent, falta el logaritmo en base 1.1 para hacerla mas plana.
         production_cost = (self.cost_coefficients[3] * (producer_quantity ** 3) + self.cost_coefficients[2] * (producer_quantity ** 2) + self.cost_coefficients[1] * producer_quantity)*8.0
@@ -90,11 +106,13 @@ class MarketEnv(gymnasium.Env):
 
         # Adjust price based on the market-clearing condition and production cost
         if self.total_demand > self.total_supply:
-            price_adjustment = (self.total_demand - self.total_supply) / (self.total_supply + 1)
-            self.price = min(self.price + price_adjustment, 200) # Price cap at 200
+            #price_adjustment = (self.total_demand - self.total_supply) / (self.total_supply + 1)
+            #self.price = min(self.price + price_adjustment, 200) # Price cap at 200
+            self.price = min(self.price + 1, 200) # Price cap at 200. Because of all the competitors.
         else:
-            price_adjustment = (self.total_supply - self.total_demand) / (self.total_demand + 1)
-            self.price = max(self.price - price_adjustment, 1)
+            #price_adjustment = (self.total_supply - self.total_demand) / (self.total_demand + 1)
+            #self.price = max(self.price - price_adjustment, 1)
+            self.price = max(self.price - 1, 1)
 
 
         # Producer's revenue
@@ -104,7 +122,7 @@ class MarketEnv(gymnasium.Env):
         producer_profit = producer_revenue - production_cost - self.fixed_costs_company
 
         # Observation: [price, total supply, total demand, production of competitors]
-        observation = np.array([self.price, self.total_supply, self.total_demand], dtype=np.float32)
+        observation = np.array([self.price, self.total_supply, self.total_demand, self.previous_action, self.progress_action], dtype=np.float32)
         observation = np.append(observation, self.competitors_quantities)
 
         # Reward is the producer's profit
