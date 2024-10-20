@@ -84,7 +84,8 @@ class MarketEnv(gymnasium.Env):
 
         if producer_quantity > self.total_demand:
             excess_units = producer_quantity - self.total_demand
-            storage_penalty = excess_units ** 2 * storage_cost_factor  # Penalización cuadrática por exceso
+            storage_factor = 1.1
+            storage_penalty = excess_units ** 2 * storage_factor  # Penalización cuadrática por exceso
             production_cost += storage_penalty
 
         # Adjust price based on the market-clearing condition and production cost
