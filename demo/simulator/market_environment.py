@@ -31,7 +31,7 @@ class MarketEnv(gymnasium.Env):
         self.total_demand = 0
 
         # Fixed costs per day.
-        self.fixed_costs_company = np.random.normal(5.0, 0.5)
+        self.fixed_costs_company = np.random.normal(10.0, 1.0)
 
         # Total production curve coefficients
         self.cost_coefficients = np.array([0.0, 4.0, -0.6, 0.03])
@@ -92,7 +92,7 @@ class MarketEnv(gymnasium.Env):
         self.total_supply = producer_quantity + self.competitors_quantities.sum()
 
         # Demand function: assume a linear demand curve (demand decreases as price increases)
-        base_demand = self.production_limit_per_producer * 3.5  # Maximum demand when price is 0
+        base_demand = self.production_limit_per_producer * 2.0  # Maximum demand when price is 0
         elasticity = 1.02  # Aumentar este valor hace que la demanda sea más sensible a los cambios de precio
         #self.total_demand = max(0, base_demand - (self.price ** elasticity))
         demand_fluctuation = np.random.normal(0, self.total_demand * 0.01)
@@ -114,19 +114,19 @@ class MarketEnv(gymnasium.Env):
 
         if producer_quantity > self.total_demand:
             excess_units = producer_quantity - self.total_demand
-            storage_factor = 1.1
+            storage_factor = 3
             storage_penalty = excess_units ** 2 * storage_factor  # Penalización cuadrática por exceso
             production_cost += storage_penalty
 
         # Adjust price based on the market-clearing condition and production cost
         if self.total_demand > self.total_supply:
-            #price_adjustment = (self.total_demand - self.total_supply) / (self.total_supply + 1)
-            #self.price = min(self.price + price_adjustment, 200) # Price cap at 200
-            self.price = min(self.price + 1, 200) # Price cap at 200. Because of all the competitors.
+            price_adjustment = (self.total_demand - self.total_supply) / (self.total_supply + 1) * 0.3
+            self.price = min(self.price + price_adjustment, 250) # Price cap at 250
+            #self.price = min(self.price + 1, 200) # Price cap at 200. Because of all the competitors.
         else:
-            #price_adjustment = (self.total_supply - self.total_demand) / (self.total_demand + 1)
-            #self.price = max(self.price - price_adjustment, 1)
-            self.price = max(self.price - 1, 1)
+            price_adjustment = (self.total_supply - self.total_demand) / (self.total_demand + 1) * 0.3
+            self.price = max(self.price - price_adjustment, 1)
+            #self.price = max(self.price - 1, 1)
 
 
         # Producer's revenue
