@@ -3,9 +3,6 @@ from gymnasium import spaces
 import numpy as np
 
 PRODUCTION_NOISE=0.05
-UP = 0
-DOWN = 1
-EQUAL = 2
 
 # Create the MarketEnv environment
 class MarketEnv(gymnasium.Env):
@@ -25,8 +22,8 @@ class MarketEnv(gymnasium.Env):
         # Action space for the producer (the agent): produce 0 to 10 units
         self.action_space = spaces.Discrete(self.production_limit_per_producer)
 
-        # Observation space: [current price, total supply, total demand, units produced of competitors]
-        self.observation_space = spaces.Box(low=0, high=np.inf, shape=(3+self.num_competitors,), dtype=np.float32)
+        # Observation space: [current price, total supply, total demand, progress action, units produced of competitors]
+        self.observation_space = spaces.Box(low=0, high=np.inf, shape=(4+self.num_competitors,), dtype=np.float32)
 
         # Initial price and supply
         self.price = 10.0
@@ -39,6 +36,10 @@ class MarketEnv(gymnasium.Env):
         # Total production curve coefficients
         self.cost_coefficients = np.array([0.0, 4.0, -0.6, 0.03])
         self.previous_action = 0
+        self.up = 0
+        self.equal = 1
+        self.down = 2
+        self.progress_action = self.equal
 
 
     def reset(self, seed=None, options=None):
@@ -49,7 +50,7 @@ class MarketEnv(gymnasium.Env):
         self.total_supply = 0
         self.total_demand = 0
         self.previous_action = 0
-        self.progress_action = EQUAL
+        self.progress_action = self.equal
         self.competitors_quantities = np.random.randint(self.competitors_production_range[0],
                                                    self.competitors_production_range[1]+1,
                                                    self.num_competitors)
@@ -68,13 +69,13 @@ class MarketEnv(gymnasium.Env):
         #Simulate competitors quantities as response to our previous action in a random walk.
         if producer_quantity > self.previous_action:
             random_steps = np.random.choice([-1, 0], size=self.num_competitors)
-            self.progress_action = UP
+            self.progress_action = self.up
         elif producer_quantity == self.previous_action:
             random_steps = np.random.choice([-1, 0, 1], size=self.num_competitors)
-            self.progress_action = DOWN
+            self.progress_action = self.equal
         else:
             random_steps = np.random.choice([0, 1], size=self.num_competitors)
-            self.progress_action = EQUAL
+            self.progress_action = self.down
 
         self.previous_action = producer_quantity
 
@@ -122,7 +123,7 @@ class MarketEnv(gymnasium.Env):
         producer_profit = producer_revenue - production_cost - self.fixed_costs_company
 
         # Observation: [price, total supply, total demand, production of competitors]
-        observation = np.array([self.price, self.total_supply, self.total_demand, self.previous_action, self.progress_action], dtype=np.float32)
+        observation = np.array([self.price, self.total_supply, self.total_demand, self.progress_action], dtype=np.float32)
         observation = np.append(observation, self.competitors_quantities)
 
         # Reward is the producer's profit

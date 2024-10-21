@@ -1,5 +1,5 @@
 import numpy as np
-from stable_baselines3 import PPO
+from stable_baselines3 import PPO, A3C, DQN #Models.
 from stable_baselines3.common.env_checker import check_env
 from visual.metrics_plotter import MetricsPlotter
 from visual.drl_metrics_callback import MetricsCallback
@@ -28,12 +28,15 @@ if __name__ == '__main__':
     seed = args.seed
     max_actions = args.max_actions
     number_random_agents = 5
+    learning_rate_models = 1e-4 #Should be optimized.
 
     env = SubprocVecEnv([make_env(max_actions) for _ in range(agents_number+max_actions+number_random_agents)]) #agents+default agents+random agent
 
     # Set up the PPO model for the environment
-    #model = PPO("MlpPolicy", env, learning_rate=1e-4, verbose=1, seed=seed)
-    model = PPO("MlpPolicy", env, learning_rate=5e-5, verbose=1, seed=seed)
+    model = PPO("MlpPolicy", env, learning_rate=learning_rate_models, verbose=1, seed=seed)
+    model_a3c = A3C("MlpPolicy", env, learning_rate=learning_rate_models, verbose=1, seed=seed)
+    model_dqn = DQN("MlpPolicy", env, learning_rate=1e-4, verbose=1, seed=seed)
+    #model = PPO("MlpPolicy", env, learning_rate=5e-5, verbose=1, seed=seed)
 
     metrics_callback = MetricsCallback(agents_number)
 
