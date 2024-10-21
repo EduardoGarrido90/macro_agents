@@ -102,8 +102,9 @@ class MarketEnv(gymnasium.Env):
         production_cost = (self.cost_coefficients[3] * (producer_quantity ** 3) + self.cost_coefficients[2] * (producer_quantity ** 2) + self.cost_coefficients[1] * producer_quantity)*8.0
         production_cost = np.random.normal(loc=production_cost, scale=production_cost*PRODUCTION_NOISE)
         
-        # Costos de insumos fluctúan en función de la oferta total
-        supply_variation = np.sin(self.timestep / 100) * 0.05  # Un pequeño patrón cíclico.
+        # Costos de insumos fluctúan en función de la oferta total y de la época del año.
+        # Se implementa como una variación sinusoidal que modifica el coste de produccion.
+        supply_variation = np.cos((self.timestep / 100) * 2.0 * np.pi) * 0.1  # Un pequeño patrón cíclico.
         production_cost = production_cost * (1.0 + supply_variation)
 
         if producer_quantity > self.total_demand:
