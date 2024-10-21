@@ -57,7 +57,7 @@ class MarketEnv(gymnasium.Env):
                                                    self.num_competitors)
 
         # Return the initial observation: [price, total_supply, total_demand, units produced of competitors]
-        observation = np.array([self.price, self.total_supply, self.total_demand, self.progress_action, self.timestep], dtype=np.float32)
+        observation = np.array([self.price, self.total_supply, self.total_demand, self.progress_action, self.timestep % 100], dtype=np.float32)
         observation = np.append(observation, self.competitors_quantities)
         return observation, {}
 
@@ -103,7 +103,7 @@ class MarketEnv(gymnasium.Env):
         production_cost = np.random.normal(loc=production_cost, scale=production_cost*PRODUCTION_NOISE)
         
         # Costos de insumos fluctúan en función de la oferta total
-        supply_variation = np.sin(self.timestep / 100) * 0.25  # Un pequeño patrón cíclico.
+        supply_variation = np.sin(self.timestep / 100) * 0.05  # Un pequeño patrón cíclico.
         production_cost = production_cost * (1.0 + supply_variation)
 
         if producer_quantity > self.total_demand:
@@ -130,7 +130,7 @@ class MarketEnv(gymnasium.Env):
         producer_profit = producer_revenue - production_cost - self.fixed_costs_company
 
         # Observation: [price, total supply, total demand, production of competitors]
-        observation = np.array([self.price, self.total_supply, self.total_demand, self.progress_action, self.timestep], dtype=np.float32)
+        observation = np.array([self.price, self.total_supply, self.total_demand, self.progress_action, self.timestep % 100], dtype=np.float32)
         observation = np.append(observation, self.competitors_quantities)
 
         # Reward is the producer's profit
