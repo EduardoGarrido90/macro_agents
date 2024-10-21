@@ -93,10 +93,15 @@ class MarketEnv(gymnasium.Env):
 
         # Demand function: assume a linear demand curve (demand decreases as price increases)
         base_demand = self.production_limit_per_producer * 3.5  # Maximum demand when price is 0
-        elasticity = 1.01  # Aumentar este valor hace que la demanda sea más sensible a los cambios de precio
+        elasticity = 1.02  # Aumentar este valor hace que la demanda sea más sensible a los cambios de precio
         #self.total_demand = max(0, base_demand - (self.price ** elasticity))
         demand_fluctuation = np.random.normal(0, self.total_demand * 0.01)
         self.total_demand = max(0, base_demand - 3 * self.price ** elasticity + demand_fluctuation) #TODO: La demanda deberia ser cuadratica, y ademas es baja.
+        
+        # Variacion sinusoidal de la demanda estacional inelastica a precio.
+        demand_variation = np.sin((self.timestep / 100) * 200 * np.pi) * 0.05  # Un pequeño patrón cíclico para la demanda.
+        self.total_demand = self.total_demand * (1.0 + demand_variation)
+
 
         # Cubic production cost for the agent, falta el logaritmo en base 1.1 para hacerla mas plana.
         production_cost = (self.cost_coefficients[3] * (producer_quantity ** 3) + self.cost_coefficients[2] * (producer_quantity ** 2) + self.cost_coefficients[1] * producer_quantity)*8.0
@@ -104,7 +109,7 @@ class MarketEnv(gymnasium.Env):
         
         # Costos de insumos fluctúan en función de la oferta total y de la época del año.
         # Se implementa como una variación sinusoidal que modifica el coste de produccion.
-        supply_variation = np.cos((self.timestep / 100) * 2.0 * np.pi) * 0.1  # Un pequeño patrón cíclico.
+        supply_variation = np.cos((self.timestep / 100) * 200 * np.pi) * 0.1  # Un pequeño patrón cíclico.
         production_cost = production_cost * (1.0 + supply_variation)
 
         if producer_quantity > self.total_demand:
