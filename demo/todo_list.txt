@@ -6,6 +6,4 @@
 4. Mejorar el repo con todo tipo de cosas, ir preguntando a ChatGPT.
 5. Ponderar esto estadísticamente. 
 6. Optimizacion de hiperparametros y con otros modelos (PPO, SAC, DDPG, etc...)
-
-
 7. Generalizar a un numero de acciones mayor.

@@ -23,7 +23,7 @@ class MarketEnv(gymnasium.Env):
         self.action_space = spaces.Discrete(self.production_limit_per_producer)
 
         # Observation space: [current price, total supply, total demand, progress action, units produced of competitors]
-        self.observation_space = spaces.Box(low=0, high=np.inf, shape=(4+self.num_competitors,), dtype=np.float32)
+        self.observation_space = spaces.Box(low=0, high=np.inf, shape=(5+self.num_competitors,), dtype=np.float32)
 
         # Initial price and supply
         self.price = 10.0
@@ -40,7 +40,7 @@ class MarketEnv(gymnasium.Env):
         self.equal = 1
         self.down = 2
         self.progress_action = self.equal
-
+        self.timestep = 0  # Inicializas el contador en el constructor
 
     def reset(self, seed=None, options=None):
 
@@ -50,13 +50,14 @@ class MarketEnv(gymnasium.Env):
         self.total_supply = 0
         self.total_demand = 0
         self.previous_action = 0
+        self.timestep = 0
         self.progress_action = self.equal
         self.competitors_quantities = np.random.randint(self.competitors_production_range[0],
                                                    self.competitors_production_range[1]+1,
                                                    self.num_competitors)
 
         # Return the initial observation: [price, total_supply, total_demand, units produced of competitors]
-        observation = np.array([self.price, self.total_supply, self.total_demand, self.progress_action], dtype=np.float32)
+        observation = np.array([self.price, self.total_supply, self.total_demand, self.progress_action, self.timestep], dtype=np.float32)
         observation = np.append(observation, self.competitors_quantities)
         return observation, {}
 
@@ -65,6 +66,8 @@ class MarketEnv(gymnasium.Env):
 
         # Producer (agent) action: how much to produce (quantity)
         producer_quantity = action
+
+        self.timestep += 1
 
         #Simulate competitors quantities as response to our previous action in a random walk.
         if producer_quantity > self.previous_action:
@@ -98,6 +101,10 @@ class MarketEnv(gymnasium.Env):
         # Cubic production cost for the agent, falta el logaritmo en base 1.1 para hacerla mas plana.
         production_cost = (self.cost_coefficients[3] * (producer_quantity ** 3) + self.cost_coefficients[2] * (producer_quantity ** 2) + self.cost_coefficients[1] * producer_quantity)*8.0
         production_cost = np.random.normal(loc=production_cost, scale=production_cost*PRODUCTION_NOISE)
+        
+        # Costos de insumos fluctúan en función de la oferta total
+        supply_variation = np.sin(self.timestep / 100) * 0.25  # Un pequeño patrón cíclico.
+        production_cost = production_cost * (1.0 + supply_variation)
 
         if producer_quantity > self.total_demand:
             excess_units = producer_quantity - self.total_demand
@@ -123,7 +130,7 @@ class MarketEnv(gymnasium.Env):
         producer_profit = producer_revenue - production_cost - self.fixed_costs_company
 
         # Observation: [price, total supply, total demand, production of competitors]
-        observation = np.array([self.price, self.total_supply, self.total_demand, self.progress_action], dtype=np.float32)
+        observation = np.array([self.price, self.total_supply, self.total_demand, self.progress_action, self.timestep], dtype=np.float32)
         observation = np.append(observation, self.competitors_quantities)
 
         # Reward is the producer's profit
@@ -138,7 +145,5 @@ class MarketEnv(gymnasium.Env):
     def render(self, mode='human'):
         # Render the current state
         print(f"Price: {self.price}, Total Supply: {self.total_supply}, Total Demand: {self.total_demand}")
-
-
 
 
