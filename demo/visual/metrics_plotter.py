@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 
 class MetricsPlotter:
 
@@ -19,49 +20,50 @@ class MetricsPlotter:
             self.plot_simulator_logs()
 
 
-    def plot_simulator_logs():
+    def plot_simulator_logs(self):
+        total_agents = self.agents_number + len(self.default_accumulated_profits) + len(self.random_accumulated_profits) 
         price_log = self.simulator_logs["price"]
         supply_log = self.simulator_logs["supply"]
         demand_log = self.simulator_logs["demand"]
         progress_log = self.simulator_logs["progress"]
-        timesteps = len(price_log) #Each log is of a timestep.
-        timesteps_x = np.linspace(0, timesteps, timesteps-1)
-        
-        plt.figure(figsize=(10, 6))
-        plt.plot(timesteps_x, price_log)
-        plt.xlabel('Timesteps')
-        plt.ylabel('Price')
-        plt.legend(loc='upper left')
-        plt.title('Price over Time')
-        plt.savefig('../results/price_timesteps.pdf')
-        plt.close()
+        timesteps = len(price_log)-1 #Each log is of a timestep.
+        timesteps_x = np.linspace(0, timesteps, timesteps+1).astype(int)
+       
+        for i in range(total_agents): 
+            plt.figure(figsize=(10, 6))
+            plt.plot(timesteps_x, price_log[:, i])
+            plt.xlabel('Timesteps')
+            plt.ylabel('Price')
+            plt.title('Price over Time')
+            plt.savefig('../results/price_timesteps_' + str(i) + '.pdf')
+            plt.close()
 
-        plt.figure(figsize=(10, 6))
-        plt.plot(timesteps_x, supply_log)
-        plt.xlabel('Timesteps')
-        plt.ylabel('Supply')
-        plt.legend(loc='upper left')
-        plt.title('Supply over Time')
-        plt.savefig('../results/supply_timesteps.pdf')
-        plt.close()
+        for i in range(total_agents): 
+            plt.figure(figsize=(10, 6))
+            plt.plot(timesteps_x, supply_log[:, i])
+            plt.xlabel('Timesteps')
+            plt.ylabel('Supply')
+            plt.title('Supply over Time')
+            plt.savefig('../results/supply_timesteps_' + str(i) + '.pdf')
+            plt.close()
 
-        plt.figure(figsize=(10, 6))
-        plt.plot(timesteps_x, demand_log)
-        plt.xlabel('Timesteps')
-        plt.ylabel('Demand')
-        plt.legend(loc='upper left')
-        plt.title('Demand over Time')
-        plt.savefig('../results/demand_timesteps.pdf')
-        plt.close()
+        for i in range(total_agents): 
+            plt.figure(figsize=(10, 6))
+            plt.plot(timesteps_x, demand_log[:, i])
+            plt.xlabel('Timesteps')
+            plt.ylabel('Demand')
+            plt.title('Demand over Time')
+            plt.savefig('../results/demand_timesteps_' + str(i) + '.pdf')
+            plt.close()
 
-        plt.figure(figsize=(10, 6))
-        plt.plot(timesteps_x, progress_log)
-        plt.xlabel('Timesteps')
-        plt.ylabel('Progress')
-        plt.legend(loc='upper left')
-        plt.title('Progress over Time')
-        plt.savefig('../results/progress_timesteps.pdf')
-        plt.close()
+        for i in range(total_agents): 
+            plt.figure(figsize=(10, 6))
+            plt.plot(timesteps_x, progress_log[:, i])
+            plt.xlabel('Timesteps')
+            plt.ylabel('Progress')
+            plt.title('Progress over Time')
+            plt.savefig('../results/progress_timesteps_' + str(i) + '.pdf')
+            plt.close()
 
 
     def plot_model_loss(self):

@@ -28,8 +28,10 @@ if __name__ == '__main__':
     seed = args.seed
     max_actions = args.max_actions
     number_random_agents = 5
+    total_agents = agents_number + max_actions + number_random_agents
     learning_rate_models = 1e-4 #Should be optimized.
-    simulator_logs = {"price" : np.array([]), "supply" : np.array([]), "demand" : np.array([]), "progress" : np.array([])}
+    simulator_logs = {"price" : np.zeros([test_periods, total_agents]), "supply" : np.zeros([test_periods, total_agents]), \
+            "demand" : np.zeros([test_periods, total_agents]), "progress" : np.zeros([test_periods, total_agents])}
 
     env = SubprocVecEnv([make_env(max_actions) for _ in range(agents_number+max_actions+number_random_agents)]) #agents+default agents+random agent
 
@@ -61,11 +63,15 @@ if __name__ == '__main__':
         random_action_agent = np.random.randint(0, 3, number_random_agents)
         action = np.append(np.append(agents_actions, default_action_agents), random_action_agent)
         #Building the final action.
-        obs, reward, terminated, truncated, info = env.step(action) #debug this an check how to create a fix agent, got to be easy do not worry, for tomorrow. 
-        simulator_logs["price"] = np.append(simulator_logs["price"], info["price"])
-        simulator_logs["supply"] = np.append(simulator_logs["supply"], info["supply"])
-        simulator_logs["demand"] = np.append(simulator_logs["demand"], info["demand"])
-        simulator_logs["progress"] = np.append(simulator_logs["progress"], info["progress"])
+        obs, reward, terminated, info = env.step(action) #debug this an check how to create a fix agent, got to be easy do not worry, for tomorrow. 
+        for index_agent, agent_information in enumerate(info):
+            simulator_logs["price"][step][index_agent] = agent_information["price"]
+        for index_agent, agent_information in enumerate(info):
+            simulator_logs["supply"][step][index_agent] = agent_information["supply"]
+        for index_agent, agent_information in enumerate(info):
+            simulator_logs["demand"][step][index_agent] = agent_information["demand"]
+        for index_agent, agent_information in enumerate(info):
+            simulator_logs["progress"][step][index_agent] = agent_information["progress"]
         env.render()
         # Update performance for each agent
         # Normal agents
@@ -87,7 +93,7 @@ if __name__ == '__main__':
         print(f"Step: {step+1}, Action: {action}, Reward: {reward}")
 
         #Commented because from the moment it never ends and it is a vector of environments.
-        if any(terminated) or any(truncated):
+        if any(terminated):# or any(truncated):
                 obs = env.reset()
                 print(f"Reset environments where agents are done")
     
