@@ -2,19 +2,66 @@ import matplotlib.pyplot as plt
 
 class MetricsPlotter:
 
-    def __init__(self, metrics_callback, agents_number, accumulated_profits, default_accumulated_profits, random_accumulated_profits, steps, plot_everything=False):
+    def __init__(self, metrics_callback, agents_number, accumulated_profits, default_accumulated_profits, random_accumulated_profits, steps, simulator_logs, plot_everything=False):
         self.metrics_callback = metrics_callback
         self.agents_number = agents_number
         self.accumulated_profits = accumulated_profits
         self.default_accumulated_profits = default_accumulated_profits
         self.random_accumulated_profits = random_accumulated_profits
         self.steps = steps
+        self.simulator_logs = simulator_logs
         if plot_everything:
             self.plot_model_loss()
             self.plot_value_loss()
             self.plot_approx_kl()
             self.plot_explained_variance()
             self.plot_accumulated_profit()
+            self.plot_simulator_logs()
+
+
+    def plot_simulator_logs():
+        price_log = self.simulator_logs["price"]
+        supply_log = self.simulator_logs["supply"]
+        demand_log = self.simulator_logs["demand"]
+        progress_log = self.simulator_logs["progress"]
+        timesteps = len(price_log) #Each log is of a timestep.
+        timesteps_x = np.linspace(0, timesteps, timesteps-1)
+        
+        plt.figure(figsize=(10, 6))
+        plt.plot(timesteps_x, price_log)
+        plt.xlabel('Timesteps')
+        plt.ylabel('Price')
+        plt.legend(loc='upper left')
+        plt.title('Price over Time')
+        plt.savefig('../results/price_timesteps.pdf')
+        plt.close()
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(timesteps_x, supply_log)
+        plt.xlabel('Timesteps')
+        plt.ylabel('Supply')
+        plt.legend(loc='upper left')
+        plt.title('Supply over Time')
+        plt.savefig('../results/supply_timesteps.pdf')
+        plt.close()
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(timesteps_x, demand_log)
+        plt.xlabel('Timesteps')
+        plt.ylabel('Demand')
+        plt.legend(loc='upper left')
+        plt.title('Demand over Time')
+        plt.savefig('../results/demand_timesteps.pdf')
+        plt.close()
+
+        plt.figure(figsize=(10, 6))
+        plt.plot(timesteps_x, progress_log)
+        plt.xlabel('Timesteps')
+        plt.ylabel('Progress')
+        plt.legend(loc='upper left')
+        plt.title('Progress over Time')
+        plt.savefig('../results/progress_timesteps.pdf')
+        plt.close()
 
 
     def plot_model_loss(self):

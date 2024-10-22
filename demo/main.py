@@ -101,4 +101,4 @@ if __name__ == '__main__':
         print(f"The accumulated profit of the random agent is: {random_agent_performance[i]}")
 
     #We plot all the training progress of the agents and the performance in a new scenario. 
-    MetricsPlotter(metrics_callback, agents_number, accumulated_profits, default_accumulated_profits, random_accumulated_profits, steps, plot_everything=True)
+    MetricsPlotter(metrics_callback, agents_number, accumulated_profits, default_accumulated_profits, random_accumulated_profits, steps, simulator_logs, plot_everything=True)

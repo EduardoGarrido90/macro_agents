@@ -32,7 +32,7 @@ class MarketEnv(gymnasium.Env):
         self.total_demand = 0
 
         # Fixed costs per day.
-        self.fixed_costs_company = np.random.normal(30, 1.0)
+        self.fixed_costs_company = np.random.normal(10, 1.0)
 
         # Total production curve coefficients
         self.cost_coefficients = np.array([0.0, 4.0, -0.6, 0.03])
@@ -49,7 +49,7 @@ class MarketEnv(gymnasium.Env):
 
         # Reset the environment to the initial state
         #self.price = 10.0
-        self.price = 30.0
+        self.price = 5.0
         self.total_supply = 0
         self.total_demand = 0
         self.previous_action = 0
@@ -130,7 +130,7 @@ class MarketEnv(gymnasium.Env):
         if self.total_demand > self.total_supply:
             price_adjustment = (self.total_demand - self.total_supply) / (self.total_supply + 1) * 0.3
             #self.price = min(self.price + price_adjustment, 250) # Price cap at 250
-            self.price = min(self.price + 1, 300) # Price cap at 200. Because of all the competitors.
+            self.price = min(self.price + 1, 200) # Price cap at 200. Because of all the competitors.
         else:
             price_adjustment = (self.total_supply - self.total_demand) / (self.total_demand + 1) * 0.3
             #self.price = max(self.price - price_adjustment, 1)
