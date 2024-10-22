@@ -42,9 +42,15 @@ class MarketEnv(gymnasium.Env):
         self.progress_action = self.equal
         self.timestep = 0  # Inicializas el contador en el constructor
 
+        self.price_log = np.array([])
+        self.total_supply_log = np.array([])
+        self.total_demand_log = np.array([])
+        self.progress_action_log = np.array([])
+
     def reset(self, seed=None, options=None):
 
         super().reset(seed=seed)
+
         # Reset the environment to the initial state
         self.price = 10.0
         self.total_supply = 0
@@ -55,6 +61,11 @@ class MarketEnv(gymnasium.Env):
         self.competitors_quantities = np.random.randint(self.competitors_production_range[0],
                                                    self.competitors_production_range[1]+1,
                                                    self.num_competitors)
+
+        self.price_log = np.array([])
+        self.total_supply_log = np.array([])
+        self.total_demand_log = np.array([])
+        self.progress_action_log = np.array([])
 
         # Return the initial observation: [price, total_supply, total_demand, units produced of competitors]
         observation = np.array([self.price, self.total_supply, self.total_demand, self.progress_action, self.timestep % 100], dtype=np.float32)
@@ -142,11 +153,21 @@ class MarketEnv(gymnasium.Env):
         # Reward is the producer's profit
         reward = producer_profit
 
+        #Update logs.
+        self.price_log = np.append(self.price_log, self.price)
+        self.total_supply_log = np.append(self.total_supply_log, self.total_supply)
+        self.total_demand_log = np.append(self.total_demand_log, self.total_demand)
+        self.progress_action_log = np.append(self.progress_action_log, self.progress_action)
+
         # No termination condition, so done is always False for now
         terminated = False
         truncated = False
 
         return observation, reward, terminated, truncated, {}
+
+
+
+    #TODO: Make a generate_plots_for_logs methods that output the logs.
 
     def render(self, mode='human'):
         # Render the current state

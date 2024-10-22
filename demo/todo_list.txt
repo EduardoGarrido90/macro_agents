@@ -1,3 +1,4 @@
+0. Descubrir que puntos hacen que los agentes ganen para los parametros del environment y tambien mas iteraciones de aprendizaje ya que el loss sigue bajando aunque la varianza exp no sube.
 1. Hacer que el simulador haga algo realista, cuadrar los numeros para el ejemplo. Hacer que no sea mejor para una cantidad producida dada, estas cerca de ello, vamos!!!!. 
 2b. La curva de produccion debe mejorar. Aunque ya esta mejor debe
 	- Ser estimada por un modelo de regresion lineal con efecto cubico y OLS con la estabilizacion mejor definida. Sacar dataset de eso y estimar.
