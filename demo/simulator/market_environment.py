@@ -26,12 +26,13 @@ class MarketEnv(gymnasium.Env):
         self.observation_space = spaces.Box(low=0, high=np.inf, shape=(5+self.num_competitors,), dtype=np.float32)
 
         # Initial price and supply
-        self.price = 10.0
+        #self.price = 10.0
+        self.price = 30.0
         self.total_supply = 0
         self.total_demand = 0
 
         # Fixed costs per day.
-        self.fixed_costs_company = np.random.normal(10.0, 1.0)
+        self.fixed_costs_company = np.random.normal(30, 1.0)
 
         # Total production curve coefficients
         self.cost_coefficients = np.array([0.0, 4.0, -0.6, 0.03])
@@ -42,17 +43,13 @@ class MarketEnv(gymnasium.Env):
         self.progress_action = self.equal
         self.timestep = 0  # Inicializas el contador en el constructor
 
-        self.price_log = np.array([])
-        self.total_supply_log = np.array([])
-        self.total_demand_log = np.array([])
-        self.progress_action_log = np.array([])
-
     def reset(self, seed=None, options=None):
 
         super().reset(seed=seed)
 
         # Reset the environment to the initial state
-        self.price = 10.0
+        #self.price = 10.0
+        self.price = 30.0
         self.total_supply = 0
         self.total_demand = 0
         self.previous_action = 0
@@ -103,7 +100,7 @@ class MarketEnv(gymnasium.Env):
         self.total_supply = producer_quantity + self.competitors_quantities.sum()
 
         # Demand function: assume a linear demand curve (demand decreases as price increases)
-        base_demand = self.production_limit_per_producer * 2.0  # Maximum demand when price is 0
+        base_demand = self.production_limit_per_producer * 3.0  # Maximum demand when price is 0
         elasticity = 1.02  # Aumentar este valor hace que la demanda sea más sensible a los cambios de precio
         #self.total_demand = max(0, base_demand - (self.price ** elasticity))
         demand_fluctuation = np.random.normal(0, self.total_demand * 0.01)
@@ -132,12 +129,12 @@ class MarketEnv(gymnasium.Env):
         # Adjust price based on the market-clearing condition and production cost
         if self.total_demand > self.total_supply:
             price_adjustment = (self.total_demand - self.total_supply) / (self.total_supply + 1) * 0.3
-            self.price = min(self.price + price_adjustment, 250) # Price cap at 250
-            #self.price = min(self.price + 1, 200) # Price cap at 200. Because of all the competitors.
+            #self.price = min(self.price + price_adjustment, 250) # Price cap at 250
+            self.price = min(self.price + 1, 300) # Price cap at 200. Because of all the competitors.
         else:
             price_adjustment = (self.total_supply - self.total_demand) / (self.total_demand + 1) * 0.3
-            self.price = max(self.price - price_adjustment, 1)
-            #self.price = max(self.price - 1, 1)
+            #self.price = max(self.price - price_adjustment, 1)
+            self.price = max(self.price - 1, 1)
 
 
         # Producer's revenue
@@ -153,22 +150,13 @@ class MarketEnv(gymnasium.Env):
         # Reward is the producer's profit
         reward = producer_profit
 
-        #Update logs.
-        self.price_log = np.append(self.price_log, self.price)
-        self.total_supply_log = np.append(self.total_supply_log, self.total_supply)
-        self.total_demand_log = np.append(self.total_demand_log, self.total_demand)
-        self.progress_action_log = np.append(self.progress_action_log, self.progress_action)
-
         # No termination condition, so done is always False for now
         terminated = False
         truncated = False
 
-        return observation, reward, terminated, truncated, {}
+        return observation, reward, terminated, truncated, {"price" : self.price, "supply" : self.total_supply, "demand" : self.total_demand, "progress" : self.progress_action}
 
-
-
-    #TODO: Make a generate_plots_for_logs methods that output the logs.
-
+    
     def render(self, mode='human'):
         # Render the current state
         print(f"Price: {self.price}, Total Supply: {self.total_supply}, Total Demand: {self.total_demand}")
