@@ -11,7 +11,8 @@ class MarketEnv(gymnasium.Env):
 
         self.production_limit_per_producer = max_actions
         
-        self.competitors_production_range = (0, self.production_limit_per_producer-1)  # Each competitor can produce 0 to 13 units
+        self.minimum_production = 0
+        self.competitors_production_range = (self.minimum_production, self.production_limit_per_producer-1)  # Each competitor can produce 0 to 13 units
         self.num_competitors = 3 #Needs to be parametrized.
 
         # Competitors' actions (they also produce a random quantity within their range)
@@ -32,7 +33,10 @@ class MarketEnv(gymnasium.Env):
         self.total_demand = 0
 
         # Fixed costs per day.
-        self.fixed_costs_company = np.random.normal(10, 1.0)
+        self.max_fixed_costs = 10.0  # Maximum fixed costs when production is 0
+        self.min_fixed_costs = 1.0   # Minimum fixed costs when production is high
+        
+        self.fixed_costs_company = np.random.normal(6.0, 1.0) #Can be higher if production is lower. 
 
         # Total production curve coefficients
         self.cost_coefficients = np.array([0.0, 4.0, -0.6, 0.03])
@@ -100,7 +104,7 @@ class MarketEnv(gymnasium.Env):
         self.total_supply = producer_quantity + self.competitors_quantities.sum()
 
         # Demand function: assume a linear demand curve (demand decreases as price increases)
-        base_demand = self.production_limit_per_producer * 3.0  # Maximum demand when price is 0
+        base_demand = self.production_limit_per_producer * 3.1  # Maximum demand when price is 0
         elasticity = 1.02  # Aumentar este valor hace que la demanda sea más sensible a los cambios de precio
         #self.total_demand = max(0, base_demand - (self.price ** elasticity))
         demand_fluctuation = np.random.normal(0, self.total_demand * 0.01)
@@ -129,25 +133,51 @@ class MarketEnv(gymnasium.Env):
         # Adjust price based on the market-clearing condition and production cost
         if self.total_demand > self.total_supply:
             price_adjustment = (self.total_demand - self.total_supply) / (self.total_supply + 1) * 0.05
-            self.price = min(self.price + price_adjustment, 250) # Price cap at 250
-            #self.price = min(self.price + 1, 200) # Price cap at 200. Because of all the competitors.
+            #self.price = min(self.price + price_adjustment, 250) # Price cap at 250
+            self.price = min(self.price + 1, 200) # Price cap at 200. Because of all the competitors.
         else:
             price_adjustment = (self.total_supply - self.total_demand) / (self.total_demand + 1) * 0.05
-            self.price = max(self.price - price_adjustment, 1)
-            #self.price = max(self.price - 1, 1)
+            #self.price = max(self.price - price_adjustment, 1)
+            self.price = max(self.price - 1, 1)
 
 
         # Producer's revenue
         producer_revenue = self.price * producer_quantity
 
+        # Fixed costs. Higher if production is not done. 
+        self.fixed_costs_company = np.random.normal(self.min_fixed_costs + (self.max_fixed_costs - self.min_fixed_costs) * np.exp(-0.5 * producer_quantity), 1.0)
+
         # Calculate producer's profit: revenue - cost
         producer_profit = producer_revenue - production_cost - self.fixed_costs_company
+
+        # Brand effects: if more production is done, the profit is incremented in a percentage.
+        # Logarithmic brand effect on profit
+        max_brand_effect = 0.3  # Maximum 30% profit increase due to brand effect
+
+        # Calculate the brand effect as a logarithmic function of production level
+        brand_effect_percentage = np.random.normal(max_brand_effect * np.log(1 + producer_quantity), 1)
+
+        # Calculate the profit with brand effects
+        producer_profit = producer_profit * (1 + brand_effect_percentage)
+
+        # Maximum subsidy at the highest production level (e.g., 13 units)
+        max_subsidy = 10.0
+
+        # Linear scaling of subsidy based on production level
+        subsidy = np.random.normal(max_subsidy * (self.production_limit_per_producer / 13.0)
+
+        # Apply the subsidy to the profit
+        producer_profit += subsidy
 
         # Observation: [price, total supply, total demand, production of competitors]
         observation = np.array([self.price, self.total_supply, self.total_demand, self.progress_action, self.timestep % 100], dtype=np.float32)
         observation = np.append(observation, self.competitors_quantities)
 
-        # Reward is the producer's profit
+        # Reward is the producer's profit scaled to force the agent to retrieve good results in training time.
+        #if producer_profit > 0:
+            #reward = producer_profit * 2.0
+        #else:
+            #reward = producer_profit * 3.0
         reward = producer_profit
 
         # No termination condition, so done is always False for now
