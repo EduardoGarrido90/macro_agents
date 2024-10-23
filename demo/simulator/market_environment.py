@@ -164,7 +164,7 @@ class MarketEnv(gymnasium.Env):
         max_subsidy = 10.0
 
         # Linear scaling of subsidy based on production level
-        subsidy = np.random.normal(max_subsidy * (self.production_limit_per_producer / 13.0)
+        subsidy = np.random.normal(max_subsidy * (self.production_limit_per_producer / 13.0))
 
         # Apply the subsidy to the profit
         producer_profit += subsidy
