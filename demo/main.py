@@ -52,8 +52,8 @@ if __name__ == '__main__':
 
     # Test the agent
     obs = env.reset()
-    obs_a2c = env_a2c.reset()
-    obs_dqn = env_dqn.reset()
+    obs_a2c = env_a2c.reset()[0]
+    obs_dqn = env_dqn.reset()[0]
     ppo_performance = 0.0
     ppo_performance = [0.0] * agents_number  # Store performance for each agent
     a2c_performance = 0.0   # Store performance for each agent
@@ -68,17 +68,16 @@ if __name__ == '__main__':
     steps = [0]
     for step in range(test_periods):
         action, _states = model.predict(obs)
-        action_a2c, _states_a2c = model_a2c.predict(obs_a2c[0])
-        action_dqn, _states_dqn = model_dqn.predict(obs_dqn[0])
+        action_a2c, _states_a2c = model_a2c.predict(obs_a2c)
+        action_dqn, _states_dqn = model_dqn.predict(obs_dqn)
         agents_actions = action[0:agents_number]
         default_action_agents = np.linspace(0, max_actions-1, num=max_actions).astype(int)
         random_action_agent = np.random.randint(0, 3, number_random_agents)
         action = np.append(np.append(agents_actions, default_action_agents), random_action_agent)
         #Building the final action.
-        import pdb; pdb.set_trace();
         obs, reward, terminated, info = env.step(action) #debug this an check how to create a fix agent, got to be easy do not worry, for tomorrow. 
-        obs_a2c, reward_a2c, terminated_a2c, info_a2c = env_a2c.step(action_a2c) #debug this an check how to create a fix agent, got to be easy do not worry, for tomorrow. 
-        obs_dqn, reward_dqn, terminated_dqn, info_dqn = env_dqn.step(action_dqn) #debug this an check how to create a fix agent, got to be easy do not worry, for tomorrow. 
+        obs_a2c, reward_a2c, terminated_a2c, truncated_a2c, info_a2c = env_a2c.step(action_a2c) #debug this an check how to create a fix agent, got to be easy do not worry, for tomorrow. 
+        obs_dqn, reward_dqn, terminated_dqn, truncated_a2c, info_dqn = env_dqn.step(action_dqn) #debug this an check how to create a fix agent, got to be easy do not worry, for tomorrow. 
         for index_agent, agent_information in enumerate(info):
             simulator_logs["price"][step][index_agent] = agent_information["price"]
         for index_agent, agent_information in enumerate(info):
