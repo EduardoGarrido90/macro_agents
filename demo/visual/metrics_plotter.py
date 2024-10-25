@@ -125,12 +125,18 @@ class MetricsPlotter:
         plt.figure(figsize=(10, 6))
         for agent in range(self.agents_number): 
             plt.plot(self.steps, self.accumulated_profits[agent], marker='o', linestyle='-', label=f'Agent {agent+1} Accumulated Profit')
-        for agent in range(self.agents_number, self.agents_number + len(self.default_accumulated_profits)): 
-            plt.plot(self.steps, self.default_accumulated_profits[agent-self.agents_number], marker='o', linestyle='-', label=f'Default Agent {agent-self.agents_number} Accumulated Profit')
+        counter = self.agents_number
+        for agent in range(self.agents_number, self.agents_number + len(self.default_accumulated_profits)):
+            gray_shade = 0.1 + 0.4 * (counter / (self.agents_number + len(self.default_accumulated_profits) - 1))
+            counter += 1
+            plt.plot(self.steps, self.default_accumulated_profits[agent-self.agents_number], marker='p', linestyle='-', alpha=0.5, linewidth=3, color=str(gray_shade), label=f'Default Agent {agent-self.agents_number} Accumulated Profit')
+        counter = self.agents_number + len(self.default_accumulated_profits)
         for agent in range(self.agents_number + len(self.default_accumulated_profits), self.agents_number + len(self.default_accumulated_profits) + len(self.random_accumulated_profits)):
-            plt.plot(self.steps, self.random_accumulated_profits[agent-self.agents_number-len(self.default_accumulated_profits)], marker='o', linestyle='-', label=f'Random Agent {agent-self.agents_number-len(self.default_accumulated_profits)} Accumulated Profit') 
-        plt.plot(self.steps, self.a2c_accumulated_profits, marker='o', linestyle='-', label=f'A2C Agent Accumulated Profit') 
-        plt.plot(self.steps, self.dqn_accumulated_profits, marker='o', linestyle='-', label=f'DQN Agent Accumulated Profit') 
+            gray_shade = 0.1 + 0.4 * (counter / (self.agents_number + len(self.default_accumulated_profits) + len(self.random_accumulated_profits) - 1))
+            counter += 1
+            plt.plot(self.steps, self.random_accumulated_profits[agent-self.agents_number-len(self.default_accumulated_profits)], marker='x', linestyle='-', color=str(gray_shade), linewidth=3, alpha=0.5, label=f'Random Agent {agent-self.agents_number-len(self.default_accumulated_profits)} Accumulated Profit') 
+        plt.plot(self.steps, self.a2c_accumulated_profits, marker='+', linestyle='-', label=f'A2C Agent Accumulated Profit') 
+        plt.plot(self.steps, self.dqn_accumulated_profits, marker='+', linestyle='-', label=f'DQN Agent Accumulated Profit') 
         
         plt.title('Accumulated Profit of each Agent Over Test Steps')
         plt.xlabel('Step')
