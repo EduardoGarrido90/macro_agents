@@ -3,7 +3,7 @@ import numpy as np
 
 class MetricsPlotter:
 
-    def __init__(self, metrics_callback, agents_number, accumulated_profits, default_accumulated_profits, random_accumulated_profits, steps, simulator_logs, plot_everything=False):
+    def __init__(self, metrics_callback, agents_number, accumulated_profits, default_accumulated_profits, random_accumulated_profits, steps, simulator_logs, a2c_accumulated_profits, dqn_accumulated_profits, plot_everything=False):
         self.metrics_callback = metrics_callback
         self.agents_number = agents_number
         self.accumulated_profits = accumulated_profits
@@ -11,6 +11,8 @@ class MetricsPlotter:
         self.random_accumulated_profits = random_accumulated_profits
         self.steps = steps
         self.simulator_logs = simulator_logs
+        self.a2c_accumulated_profits = a2c_accumulated_profits
+        self.dqn_accumulated_profits = dqn_accumulated_profits
         if plot_everything:
             self.plot_model_loss()
             self.plot_value_loss()
@@ -127,7 +129,9 @@ class MetricsPlotter:
             plt.plot(self.steps, self.default_accumulated_profits[agent-self.agents_number], marker='o', linestyle='-', label=f'Default Agent {agent-self.agents_number} Accumulated Profit')
         for agent in range(self.agents_number + len(self.default_accumulated_profits), self.agents_number + len(self.default_accumulated_profits) + len(self.random_accumulated_profits)):
             plt.plot(self.steps, self.random_accumulated_profits[agent-self.agents_number-len(self.default_accumulated_profits)], marker='o', linestyle='-', label=f'Random Agent {agent-self.agents_number-len(self.default_accumulated_profits)} Accumulated Profit') 
-
+        plt.plot(self.steps, self.a2c_accumulated_profits, marker='o', linestyle='-', label=f'A2C Agent Accumulated Profit') 
+        plt.plot(self.steps, self.dqn_accumulated_profits, marker='o', linestyle='-', label=f'DQN Agent Accumulated Profit') 
+        
         plt.title('Accumulated Profit of each Agent Over Test Steps')
         plt.xlabel('Step')
         plt.ylabel('Accumulated Profit')
