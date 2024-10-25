@@ -29,7 +29,7 @@ if __name__ == '__main__':
     max_actions = args.max_actions
     number_random_agents = 5
     alternative_drl_agents = 2
-    total_agents = agents_number + max_actions + number_random_agents + alternative_drl_agents
+    total_agents = agents_number + max_actions + number_random_agents 
     learning_rate_models = 1e-4 #Should be optimized.
     simulator_logs = {"price" : np.zeros([test_periods, total_agents]), "supply" : np.zeros([test_periods, total_agents]), \
             "demand" : np.zeros([test_periods, total_agents]), "progress" : np.zeros([test_periods, total_agents])}
@@ -41,16 +41,14 @@ if __name__ == '__main__':
     # Set up the models for the environment
     model = PPO("MlpPolicy", env, learning_rate=learning_rate_models, verbose=1, seed=seed)
     model_a2c = A2C("MlpPolicy", env_a2c, learning_rate=learning_rate_models, verbose=1, seed=seed)
-    model_dqn = DQN("MlpPolicy", env_dqn, learning_rate=1e-4, verbose=1, seed=seed)
+    model_dqn = DQN("MlpPolicy", env_dqn, learning_rate=learning_rate_models, verbose=1, seed=seed)
 
     metrics_callback = MetricsCallback(agents_number)
-    metrics_callback_a2c = MetricsCallback(1)
-    metrics_callback_dqn = MetricsCallback(1)
 
     # Train the agent
     model.learn(total_timesteps=total_training_timesteps, callback=metrics_callback, progress_bar=False)
-    model_a2c.learn(total_timesteps=total_training_timesteps, callback=metrics_callback_a2c, progress_bar=False)
-    model_dqn.learn(total_timesteps=total_training_timesteps, callback=metrics_callback_dqn, progress_bar=False)
+    model_a2c.learn(total_timesteps=total_training_timesteps, progress_bar=False)
+    model_dqn.learn(total_timesteps=total_training_timesteps, progress_bar=False)
 
     # Test the agent
     obs = env.reset()
@@ -70,13 +68,14 @@ if __name__ == '__main__':
     steps = [0]
     for step in range(test_periods):
         action, _states = model.predict(obs)
-        action_a2c, _states_a2c = model_a2c.predict(obs_a2c)
-        action_dqn, _states_dqn = model_dqn.predict(obs_dqn)
+        action_a2c, _states_a2c = model_a2c.predict(obs_a2c[0])
+        action_dqn, _states_dqn = model_dqn.predict(obs_dqn[0])
         agents_actions = action[0:agents_number]
         default_action_agents = np.linspace(0, max_actions-1, num=max_actions).astype(int)
         random_action_agent = np.random.randint(0, 3, number_random_agents)
         action = np.append(np.append(agents_actions, default_action_agents), random_action_agent)
         #Building the final action.
+        import pdb; pdb.set_trace();
         obs, reward, terminated, info = env.step(action) #debug this an check how to create a fix agent, got to be easy do not worry, for tomorrow. 
         obs_a2c, reward_a2c, terminated_a2c, info_a2c = env_a2c.step(action_a2c) #debug this an check how to create a fix agent, got to be easy do not worry, for tomorrow. 
         obs_dqn, reward_dqn, terminated_dqn, info_dqn = env_dqn.step(action_dqn) #debug this an check how to create a fix agent, got to be easy do not worry, for tomorrow. 
