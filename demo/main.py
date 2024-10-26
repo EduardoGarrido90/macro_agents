@@ -2,6 +2,7 @@ import numpy as np
 from stable_baselines3 import PPO, A2C, DQN #Models.
 from stable_baselines3.common.env_checker import check_env
 from visual.metrics_plotter import MetricsPlotter
+from visual.report_maker import ReportMaker
 from visual.drl_metrics_callback import MetricsCallback
 from simulator.market_environment import MarketEnv
 import matplotlib
@@ -135,3 +136,6 @@ if __name__ == '__main__':
     
     #We plot all the training progress of the agents and the performance in a new scenario. 
     MetricsPlotter(metrics_callback, agents_number, accumulated_profits, default_accumulated_profits, random_accumulated_profits, steps, simulator_logs, a2c_accumulated_profits, dqn_accumulated_profits, plot_everything=True)
+
+    #We generate a report of the results in profit terms of the last day.
+    ReportMaker(ppo_performance, default_agents_performance, random_agent_performance, a2c_performance, dqn_performance, test_periods)
