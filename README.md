@@ -1,16 +1,16 @@
 
-# Macro Agents
+# Micro Agents
 
-**Macroeconomic Agents Trained with Deep Reinforcement Learning (DRL) on Macroeconomic Simulators**
+**Microeconomic Agents Trained with Deep Reinforcement Learning (DRL) on Microeconomic Simulators**
 
 ## Overview
 
-**Macro Agents** is a project focused on training agents using deep reinforcement learning (DRL) within macroeconomic simulators. The goal is to explore and model the behavior of economic agents in complex environments, simulating various macroeconomic factors, such as production, consumption, and market dynamics.
+**Micro Agents** is a project focused on training agents using deep reinforcement learning (DRL) within microeconomic simulators. The goal is to explore and model the behavior of economic agents in complex environments, simulating various microeconomic factors, such as production, consumption, and market dynamics.
 
 ## Features
 
-- **Custom Macroeconomic Simulators**: Simulates different macroeconomic environments with adjustable parameters.
-- **Deep Reinforcement Learning**: Agents are trained using DRL techniques to optimize their decision-making in a macroeconomic context.
+- **Custom Microeconomic Simulators**: Simulates different microeconomic environments with adjustable parameters.
+- **Deep Reinforcement Learning**: Agents are trained using DRL techniques to optimize their decision-making in a microeconomic context.
 - **Agent-Based Modeling**: Investigate how agents behave under varying economic scenarios, allowing for the study of emergent market behavior.
 - **Scalability**: The framework can be expanded to include multiple agents, competitors, and dynamic environments.
 
@@ -18,7 +18,7 @@
 
 1. Clone this repository:
    \`\`\`bash
-   git clone https://github.com/EduardoGarrido90/macro_agents.git
+   git clone https://github.com/EduardoGarrido90/micro_agents.git
    cd macro_agents
    \`\`\`
 2. Install the required dependencies:
@@ -29,9 +29,9 @@
 ## Usage
 
 1. Configure the simulation environment and agent settings in the configuration file and bashes.
-2. Run the macroeconomic simulation with the bash file:
+2. Run the microeconomic simulation with the bash file:
    \`\`\`bash
-   ./execute_macro_agent.sh
+   ./execute_micro_agent.sh
    \`\`\`
 3. Analyze the results and monitor agent performance through the output logs or visualizations.
 
