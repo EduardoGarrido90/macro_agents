@@ -1,5 +1,5 @@
 
-# Micro Agents
+# Microeconomic Agents
 
 **Microeconomic Agents Trained with Deep Reinforcement Learning (DRL) on Microeconomic Simulators**
 
