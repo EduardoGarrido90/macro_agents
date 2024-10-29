@@ -28,6 +28,23 @@ if __name__ == '__main__':
     total_training_timesteps = args.total_training_timesteps
     seed = args.seed
     max_actions = args.max_actions
+    min_prod = args.min_prod
+    num_competitors = args.num_competitors
+    initial_price = args.initial_price
+    max_fixed_costs = args.max_fixed_costs
+    min_fixes_costs = args.min_fixed_costs
+    cost_coef_0 = args.cost_coef_0
+    cost_coef_1 = args.cost_coef_1
+    cost_coef_2 = args.cost_coef_2
+    cost_coef_3 = args.cost_coef_3
+    elasticity = args.elasticity
+    base_demand = args.base_demand
+    prod_noise = args.prod_noise
+    storage_factor = args.storage_factor
+    brand_effect = args.brand_effect
+    max_subsidy = args.max_subsidy
+
+
     number_random_agents = 5
     alternative_drl_agents = 2
     total_agents = agents_number + max_actions + number_random_agents 
