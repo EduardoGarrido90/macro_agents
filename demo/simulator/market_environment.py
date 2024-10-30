@@ -6,14 +6,14 @@ PRODUCTION_NOISE=0.05
 
 # Create the MarketEnv environment
 class MarketEnv(gymnasium.Env):
-    def __init__(self, max_actions):
+    def __init__(self, max_actions, min_prod, num_competitors, initial_price, max_fixed_costs, min_fixed_costs, cost_coef_0, cost_coef_1, cost_coef_2, cost_coef_3):
         super(MarketEnv, self).__init__()
 
         self.production_limit_per_producer = max_actions
         
-        self.minimum_production = 0
+        self.minimum_production = min_prod
         self.competitors_production_range = (self.minimum_production, self.production_limit_per_producer-1)  # Each competitor can produce 0 to 13 units
-        self.num_competitors = 3 #Needs to be parametrized.
+        self.num_competitors = num_competitors 
 
         # Competitors' actions (they also produce a random quantity within their range)
         self.competitors_quantities = np.random.randint(self.competitors_production_range[0],
@@ -28,18 +28,18 @@ class MarketEnv(gymnasium.Env):
 
         # Initial price and supply
         #self.price = 10.0
-        self.price = 15.0
+        self.price = initial_price
         self.total_supply = 0
         self.total_demand = 0
 
         # Fixed costs per day.
-        self.max_fixed_costs = 10.0  # Maximum fixed costs when production is 0
-        self.min_fixed_costs = 1.0   # Minimum fixed costs when production is high
+        self.max_fixed_costs = max_fixed_costs  # Maximum fixed costs when production is 0
+        self.min_fixed_costs = min_fixed_costs   # Minimum fixed costs when production is high
         
         self.fixed_costs_company = np.random.normal(6.0, 1.0) #Can be higher if production is lower. 
 
         # Total production curve coefficients
-        self.cost_coefficients = np.array([0.0, 4.0, -0.6, 0.03])
+        self.cost_coefficients = np.array([cost_coef_0, cost_coef_1, cost_coef_2, cost_coef_3])
         self.previous_action = 0
         self.up = 0
         self.equal = 1

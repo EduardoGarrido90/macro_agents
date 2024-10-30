@@ -27,6 +27,8 @@ class ArgumentParser:
         self.parser.add_argument('--storage_factor', type=float, default=2, help='Storage factor')
         self.parser.add_argument('--brand_effect', type=float, default=0.3, help='Brand effect')
         self.parser.add_argument('--max_subsidy', type=float, default=10, help='Subsidies')
+        self.parser.add_argument('--number_random_agents', type=int, default=5, help='Random agents to compare')
+        self.parser.add_argument('--learning_rate', type=float, default=0.0001, help='Learning rate')
 
     def parse_args(self):
         # Parse and return the arguments
