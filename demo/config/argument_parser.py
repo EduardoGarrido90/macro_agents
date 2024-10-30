@@ -22,7 +22,7 @@ class ArgumentParser:
         self.parser.add_argument('--cost_coef_2', type=float, default=-0.6, help='Quad cost coef')
         self.parser.add_argument('--cost_coef_3', type=float, default=0.03, help='Cubic cost coef')
         self.parser.add_argument('--elasticity', type=float, default=1.02, help='Elasticity')
-        self.parser.add_argument('--base_demand', type=float, default=43.4, help='Base demand')
+        self.parser.add_argument('--base_demand', type=float, default=3.1, help='Base demand')
         self.parser.add_argument('--prod_noise', type=float, default=0.05, help='Prod noise')
         self.parser.add_argument('--storage_factor', type=float, default=2, help='Storage factor')
         self.parser.add_argument('--brand_effect', type=float, default=0.3, help='Brand effect')

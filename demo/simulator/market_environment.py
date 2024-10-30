@@ -6,7 +6,7 @@ PRODUCTION_NOISE=0.05
 
 # Create the MarketEnv environment
 class MarketEnv(gymnasium.Env):
-    def __init__(self, max_actions, min_prod, num_competitors, initial_price, max_fixed_costs, min_fixed_costs, cost_coef_0, cost_coef_1, cost_coef_2, cost_coef_3):
+    def __init__(self, max_actions, min_prod, num_competitors, initial_price, max_fixed_costs, min_fixed_costs, cost_coef_0, cost_coef_1, cost_coef_2, cost_coef_3, base_demand, elasticity):
         super(MarketEnv, self).__init__()
 
         self.production_limit_per_producer = max_actions
@@ -38,6 +38,9 @@ class MarketEnv(gymnasium.Env):
         
         self.fixed_costs_company = np.random.normal(6.0, 1.0) #Can be higher if production is lower. 
 
+        self.base_demand = base_demand
+        self.elasticity = elasticity
+
         # Total production curve coefficients
         self.cost_coefficients = np.array([cost_coef_0, cost_coef_1, cost_coef_2, cost_coef_3])
         self.previous_action = 0
@@ -46,6 +49,7 @@ class MarketEnv(gymnasium.Env):
         self.down = 2
         self.progress_action = self.equal
         self.timestep = 0  # Inicializas el contador en el constructor
+
 
     def reset(self, seed=None, options=None):
 
@@ -104,8 +108,8 @@ class MarketEnv(gymnasium.Env):
         self.total_supply = producer_quantity + self.competitors_quantities.sum()
 
         # Demand function: assume a linear demand curve (demand decreases as price increases)
-        base_demand = self.production_limit_per_producer * 3.1  # Maximum demand when price is 0
-        elasticity = 1.02  # Aumentar este valor hace que la demanda sea más sensible a los cambios de precio
+        base_demand = self.production_limit_per_producer * self.base_demand  # Maximum demand when price is 0
+        elasticity = self.elasticity  # Aumentar este valor hace que la demanda sea más sensible a los cambios de precio
         #self.total_demand = max(0, base_demand - (self.price ** elasticity))
         demand_fluctuation = np.random.normal(0, self.total_demand * 0.01)
         self.total_demand = max(0, base_demand - 3 * self.price ** elasticity + demand_fluctuation) #TODO: La demanda deberia ser cuadratica, y ademas es baja.

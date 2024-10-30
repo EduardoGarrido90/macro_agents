@@ -12,9 +12,9 @@ from config.argument_parser import ArgumentParser
 matplotlib.use('Agg')  # Use the 'Agg' backend for rendering without a display
 
 
-def make_env(max_actions, min_prod, num_competitors, initial_price, max_fixed_costs, min_fixed_costs, cost_coef_0, cost_coef_1, cost_coef_2, cost_coef_3):
+def make_env(max_actions, min_prod, num_competitors, initial_price, max_fixed_costs, min_fixed_costs, cost_coef_0, cost_coef_1, cost_coef_2, cost_coef_3, base_demand, elasticity):
     def _init():
-        env = MarketEnv(max_actions, min_prod, num_competitors, initial_price, max_fixed_costs, min_fixed_costs, cost_coef_0, cost_coef_1, cost_coef_2, cost_coef_3)  # Crear la instancia de MarketEnv
+        env = MarketEnv(max_actions, min_prod, num_competitors, initial_price, max_fixed_costs, min_fixed_costs, cost_coef_0, cost_coef_1, cost_coef_2, cost_coef_3, base_demand, elasticity)  # Crear la instancia de MarketEnv
         return env
     return _init  # Retorna la función _init, no el entorno directamente
 
@@ -37,8 +37,8 @@ if __name__ == '__main__':
     cost_coef_1 = args.cost_coef_1 #ok
     cost_coef_2 = args.cost_coef_2 #ok
     cost_coef_3 = args.cost_coef_3 #ok
-    elasticity = args.elasticity
-    base_demand = args.base_demand
+    elasticity = args.elasticity #ok
+    base_demand = args.base_demand #ok
     prod_noise = args.prod_noise
     storage_factor = args.storage_factor
     brand_effect = args.brand_effect
@@ -53,9 +53,9 @@ if __name__ == '__main__':
     simulator_logs = {"price" : np.zeros([test_periods, total_agents]), "supply" : np.zeros([test_periods, total_agents]), \
             "demand" : np.zeros([test_periods, total_agents]), "progress" : np.zeros([test_periods, total_agents])}
 
-    env = SubprocVecEnv([make_env(max_actions, min_prod, num_competitors, initial_price, max_fixed_costs, min_fixed_costs, cost_coef_0, cost_coef_1, cost_coef_2, cost_coef_3) for _ in range(total_agents)]) 
-    env_a2c = MarketEnv(max_actions, min_prod, num_competitors, initial_price, max_fixed_costs, min_fixed_costs, cost_coef_0, cost_coef_1, cost_coef_2, cost_coef_3)
-    env_dqn = MarketEnv(max_actions, min_prod, num_competitors, initial_price, max_fixed_costs, min_fixed_costs, cost_coef_0, cost_coef_1, cost_coef_2, cost_coef_3)
+    env = SubprocVecEnv([make_env(max_actions, min_prod, num_competitors, initial_price, max_fixed_costs, min_fixed_costs, cost_coef_0, cost_coef_1, cost_coef_2, cost_coef_3, base_demand, elasticity) for _ in range(total_agents)]) 
+    env_a2c = MarketEnv(max_actions, min_prod, num_competitors, initial_price, max_fixed_costs, min_fixed_costs, cost_coef_0, cost_coef_1, cost_coef_2, cost_coef_3, base_demand, elasticity)
+    env_dqn = MarketEnv(max_actions, min_prod, num_competitors, initial_price, max_fixed_costs, min_fixed_costs, cost_coef_0, cost_coef_1, cost_coef_2, cost_coef_3, base_demand, elasticity)
 
     # Set up the models for the environment
     model = PPO("MlpPolicy", env, learning_rate=learning_rate_models, verbose=1, seed=seed)
