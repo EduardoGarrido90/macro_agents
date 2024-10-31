@@ -29,6 +29,7 @@ class ArgumentParser:
         self.parser.add_argument('--max_subsidy', type=float, default=10, help='Subsidies')
         self.parser.add_argument('--number_random_agents', type=int, default=5, help='Random agents to compare')
         self.parser.add_argument('--learning_rate', type=float, default=0.0001, help='Learning rate')
+        self.parser.add_argument('--max_price', type=int, default=200, help='Max market price')
 
     def parse_args(self):
         # Parse and return the arguments

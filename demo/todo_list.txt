@@ -1,10 +1,16 @@
-0. Descubrir que puntos hacen que los agentes ganen para los parametros del environment y tambien mas iteraciones de aprendizaje ya que el loss sigue bajando aunque la varianza exp no sube.
-1. Hacer que el simulador haga algo realista, cuadrar los numeros para el ejemplo. Hacer que no sea mejor para una cantidad producida dada, estas cerca de ello, vamos!!!!. 
-2b. La curva de produccion debe mejorar. Aunque ya esta mejor debe
-	- Ser estimada por un modelo de regresion lineal con efecto cubico y OLS con la estabilizacion mejor definida. Sacar dataset de eso y estimar.
-	- Aun seria mejor si encuentras un dataset real de esto.    
-3. Si todo va bien y aprende, ir metiendo 4 efectos mas, no meter ninguno mas hasta que no aprenda sobre los anteriores.
-4. Mejorar el repo con todo tipo de cosas, ir preguntando a ChatGPT.
-5. Ponderar esto estadísticamente. 
-6. Optimizacion de hiperparametros y con otros modelos (PPO, SAC, DDPG, etc...)
-7. Generalizar a un numero de acciones mayor.
+Tareas pendientes:
+
+1. La curva de produccion debe mejorar. Aunque ya esta mejor debe:
+	- Ser estimada por un modelo de regresion lineal con efecto cubico y OLS con la estabilizacion mejor definida. Sacar dataset de eso por ejemplo para luz, gas o petroleo y estimar.
+2. Meter mas dinamicas del mercado al simulador.
+3. Incluir tests automaticos o validacion al repositorio.
+4. Optimizacion de hiperparametros y con otros modelos (PPO, SAC, DDPG, etc...)
+5. Generalizar a un numero de productos complementarios y sustitutivos mayor con porcentaje de semejanza.
+6. Hacer un comportamiento mas inteligente de los productos.
+7. Hacer una simulacion multi-agente.
+8. Demanda mas inteligente para reaccionar a los distintos productos.
+9. Meter estrategias de coste y estrategias premium, es decir ajustar tambien la calidad del producto.
+
+PRIORIDAD 1: Hacer una distribucion de probabilidad de los parámetros del simulador y muestrear para obtener evidencia de que los agentes aprenden no solo para estimacion puntual de parametros sino en un espacio de parametros pasan tambien las hipotesis.
+
+

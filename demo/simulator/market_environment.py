@@ -2,15 +2,18 @@ import gymnasium
 from gymnasium import spaces
 import numpy as np
 
-PRODUCTION_NOISE=0.05
-
 # Create the MarketEnv environment
 class MarketEnv(gymnasium.Env):
-    def __init__(self, max_actions, min_prod, num_competitors, initial_price, max_fixed_costs, min_fixed_costs, cost_coef_0, cost_coef_1, cost_coef_2, cost_coef_3, base_demand, elasticity):
+    def __init__(self, max_actions, min_prod, num_competitors, initial_price, max_fixed_costs, min_fixed_costs, cost_coef_0, cost_coef_1, cost_coef_2, cost_coef_3, base_demand, elasticity, prod_noise, storage_factor, brand_effect, max_subsidy, max_price):
         super(MarketEnv, self).__init__()
 
         self.production_limit_per_producer = max_actions
-        
+        self.prod_noise = prod_noise
+        self.storage_factor = storage_factor
+        self.brand_effect = brand_effect
+        self.max_subsidy = max_subsidy
+        self.max_price = max_price
+
         self.minimum_production = min_prod
         self.competitors_production_range = (self.minimum_production, self.production_limit_per_producer-1)  # Each competitor can produce 0 to 13 units
         self.num_competitors = num_competitors 
@@ -121,7 +124,7 @@ class MarketEnv(gymnasium.Env):
 
         # Cubic production cost for the agent, falta el logaritmo en base 1.1 para hacerla mas plana.
         production_cost = (self.cost_coefficients[3] * (producer_quantity ** 3) + self.cost_coefficients[2] * (producer_quantity ** 2) + self.cost_coefficients[1] * producer_quantity)*8.0
-        production_cost = np.random.normal(loc=production_cost, scale=production_cost*PRODUCTION_NOISE)
+        production_cost = np.random.normal(loc=production_cost, scale=production_cost*self.prod_noise)
         
         # Costos de insumos fluctúan en función de la oferta total y de la época del año.
         # Se implementa como una variación sinusoidal que modifica el coste de produccion.
@@ -130,15 +133,14 @@ class MarketEnv(gymnasium.Env):
 
         if producer_quantity > self.total_demand:
             excess_units = producer_quantity - self.total_demand
-            storage_factor = 2
-            storage_penalty = excess_units ** 2 * storage_factor  # Penalización cuadrática por exceso
+            storage_penalty = excess_units ** 2 * self.storage_factor  # Penalización cuadrática por exceso
             production_cost += storage_penalty
 
         # Adjust price based on the market-clearing condition and production cost
         if self.total_demand > self.total_supply:
             price_adjustment = (self.total_demand - self.total_supply) / (self.total_supply + 1) * 0.05
             #self.price = min(self.price + price_adjustment, 250) # Price cap at 250
-            self.price = min(self.price + 1, 200) # Price cap at 200. Because of all the competitors.
+            self.price = min(self.price + 1, self.max_price) # Price cap at 200. Because of all the competitors.
         else:
             price_adjustment = (self.total_supply - self.total_demand) / (self.total_demand + 1) * 0.05
             #self.price = max(self.price - price_adjustment, 1)
@@ -156,7 +158,7 @@ class MarketEnv(gymnasium.Env):
 
         # Brand effects: if more production is done, the profit is incremented in a percentage.
         # Logarithmic brand effect on profit
-        max_brand_effect = 0.3  # Maximum 30% profit increase due to brand effect
+        max_brand_effect = self.brand_effect  # Maximum 30% profit increase due to brand effect
 
         # Calculate the brand effect as a logarithmic function of production level
         brand_effect_percentage = np.random.normal(max_brand_effect * np.log(1 + producer_quantity), 1)
@@ -164,11 +166,8 @@ class MarketEnv(gymnasium.Env):
         # Calculate the profit with brand effects
         producer_profit = producer_profit * (1 + brand_effect_percentage)
 
-        # Maximum subsidy at the highest production level (e.g., 13 units)
-        max_subsidy = 10.0
-
         # Linear scaling of subsidy based on production level
-        subsidy = np.random.normal(max_subsidy * (self.production_limit_per_producer / 13.0))
+        subsidy = np.random.normal(self.max_subsidy * (producer_quantity/ self.production_limit_per_producer), 1.0)
 
         # Apply the subsidy to the profit
         producer_profit += subsidy
