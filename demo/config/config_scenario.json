@@ -1,0 +1,53 @@
+{
+    "parameters": {
+        "max_actions": {
+            "lower": 10,
+            "upper": 20
+        },
+        "min_prod": {
+            "lower": 0,
+            "upper": 3
+        },
+        "num_competitors": {
+            "lower": 2,
+            "upper": 5
+        },
+        "max_fixed_costs": {
+            "lower": 8,
+            "upper": 20
+        },
+        "min_fixed_costs": {
+            "lower": 1,
+            "upper": 4
+        },
+        "elasticity": {
+            "lower": 1.01,
+            "upper": 1.2
+        },
+        "base_demand": {
+            "lower": 2.5,
+            "upper": 4.5
+        },
+        "prod_noise": {
+            "lower": 0.03,
+            "upper": 0.1
+        },
+        "storage_factor": {
+            "lower": 1.5,
+            "upper": 3
+        },
+        "brand_effect": {
+            "lower": 0.2,
+            "upper": 0.5
+        },
+        "max_subsidy": {
+            "lower": 7,
+            "upper": 13
+        },
+        "max_price": {
+            "lower": 150,
+            "upper": 250
+        }
+    }
+}
+
