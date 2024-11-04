@@ -1,9 +1,10 @@
 from config.config_parser import ConfigParser
 import numpy as np
 
+file_name = "run_sampled_experiment.sh"
+
 def create_shell_script(parameters):
     # Open the file in write mode
-    file_name = "run_sampled_experiment.sh"
     with open(file_name, "w") as file:
         # Write the shebang line
         file.write("#!/bin/bash\n\n")
@@ -25,6 +26,18 @@ def create_shell_script(parameters):
     import os
     os.chmod(file_name, 0o755)
 
+def execute_shell_script():
+    # Run the shell script and wait for it to complete
+    try:
+        result = subprocess.run([file_name], capture_output=True, text=True, check=True)
+        print("Script executed successfully.")
+        print("Output:")
+        print(result.stdout)  # Print the output of the script
+    except subprocess.CalledProcessError as e:
+        print("An error occurred while executing the script.")
+        print("Error output:")
+        print(e.stderr)  # Print the error output if the script fails
+
 if __name__ == '__main__':
     n_samples = 25
 
@@ -40,7 +53,8 @@ if __name__ == '__main__':
         #Train all the agents in the 25 samples.
         #1. Generate the sh file.
         create_shell_script(environments[i])
-        #TODO 2. Execute the sh file and wait for the result.
+        #2. Execute the sh file and wait for the result.
+        execute_shell_script()
         #TODO 3. Read the result and continue.
     
 
