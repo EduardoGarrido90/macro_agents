@@ -38,8 +38,12 @@ def execute_shell_script():
         print("Error output:")
         print(e.stderr)  # Print the error output if the script fails
 
+#Invoke this class as: python script_name.py n_samples
 if __name__ == '__main__':
-    n_samples = 25
+    if len(sys.argv) > 1:
+        n_samples = int(sys.argv[1])
+    else:
+        n_samples = 25  # Default value if no argument is provided
 
     config_parser = ConfigParser('../config/config_scenario.json')
     #parameters = config_parser.get_parameters()
